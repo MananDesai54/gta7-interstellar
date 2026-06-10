@@ -22,7 +22,7 @@ export function Trajectory() {
     if (!l) return
     const s = useStore.getState()
     const speed = world.playerVel.length()
-    if (!s.started || s.dead || speed < 25) {
+    if (!s.started || s.dead || speed < 25 || world.surface) {
       l.visible = false
       return
     }

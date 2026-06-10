@@ -32,6 +32,8 @@ export const world = {
   flashT: 0, // last damage timestamp (performance.now), HUD reads
   warp: 0, // 0..1 overdrive amount, HUD reads
   invulnUntil: 0, // respawn grace period (performance.now)
+  surface: null, // mirrors store.surface for the frame loops
+  landedBody: null, // which body we landed on, for the return-to-orbit
 
   // mission marker, anchored to an orbiting body when anchor is set
   mission: null,

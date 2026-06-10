@@ -24,10 +24,12 @@ import { Police } from './components/Police'
 import { Lasers } from './components/Lasers'
 import { Explosions } from './components/Explosions'
 import { MissionMarker } from './components/MissionMarker'
+import { Surface } from './components/Surface'
 import { Hud } from './components/Hud'
 import { TitleScreen } from './components/TitleScreen'
 import { useStore } from './game/store'
 import { world } from './game/world'
+import { SURFACES } from './game/surfaces'
 
 const KEYMAP = [
   { name: 'forward', keys: ['KeyW'] },
@@ -41,10 +43,12 @@ const KEYMAP = [
   { name: 'boost', keys: ['ShiftLeft', 'ShiftRight'] },
   { name: 'fire', keys: ['Space'] },
   { name: 'warp', keys: ['KeyX'] },
+  { name: 'land', keys: ['KeyL'] },
 ]
 
 export default function Game() {
   const dead = useStore((s) => s.dead)
+  const surface = useStore((s) => s.surface)
 
   useEffect(() => {
     if (process.env.NODE_ENV !== 'production') window.__game = { world, useStore }
@@ -59,6 +63,7 @@ export default function Game() {
           dpr={[1, 2]}
         >
           <color attach="background" args={['#02030a']} />
+          {surface && <fog attach="fog" args={[SURFACES[surface].fog, 500, SURFACES[surface].fogFar]} />}
           <ambientLight intensity={0.35} color="#46566e" />
           <Stars radius={16000} depth={30000} count={9000} factor={180} saturation={0} fade speed={0.4} />
           <PhysicsSystem />
@@ -77,6 +82,7 @@ export default function Game() {
           <Discoveries />
           <RaceCourse />
           <Convoy />
+          <Surface />
           <PlayerShip />
           <Traffic />
           <Police />

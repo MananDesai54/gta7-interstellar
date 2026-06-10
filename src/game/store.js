@@ -29,6 +29,15 @@ export const useStore = create((set, get) => ({
   ore: 0,
   discoveries: [],
   chapterCard: null, // {num, title} — GTA-style mission intro card
+  surface: null, // 'earth'|'mars'|'luna' while landed
+  landPrompt: null, // body name when close enough to land
+  surfaceJob: 0, // 0 none, 1 pickup set, 2 delivering
+
+  setSurface: (surface) => set({ surface }),
+  setLandPrompt: (landPrompt) => {
+    if (get().landPrompt !== landPrompt) set({ landPrompt })
+  },
+  setSurfaceJob: (surfaceJob) => set({ surfaceJob }),
 
   // garage
   upgrades: {},

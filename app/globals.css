@@ -297,3 +297,9 @@ body { font-family: var(--hud-font); }
 
 /* ---------- busted ---------- */
 .wasted.busted span { color: #3d8bff; text-shadow: 0 0 36px #000, 5px 5px 0 #000; }
+
+/* ---------- landing / surface ---------- */
+.dock-prompt.land { bottom: 30vh; color: var(--gold); }
+.surface-tag { position: fixed; top: 64px; right: 26px; font-size: 13px; font-weight: 700;
+  letter-spacing: 2px; color: #ffd24a; text-shadow: 1px 1px 0 #000; }
+.surface-tag span { color: #9aa3b5; font-weight: 400; }

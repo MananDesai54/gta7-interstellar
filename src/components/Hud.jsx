@@ -6,6 +6,7 @@ import { STATIONS, CITY_POS, HIDEOUT_POS } from '../game/constants'
 import { MAP_R } from '../game/physics'
 import { SHOP, PAINTS, maxHpFor, ORE_PRICE } from '../game/shop'
 import { DISCOVERIES } from '../game/discoveries'
+import { SURFACES } from '../game/surfaces'
 import { beep, startRadio } from '../game/audio'
 
 const fwdTmp = new THREE.Vector3()
@@ -24,6 +25,7 @@ export function Hud() {
     started, dead, deathReason, hp, boost, cash, wanted, ore,
     missionTitle, missionBody, banner, station, dialogue, lineIdx,
     shopOpen, nearStation, race, upgrades, paint, paused, showLog, discoveries, chapterCard, busted,
+    surface, landPrompt,
   } = useStore()
   const nextStation = useStore((s) => s.nextStation)
   const buy = useStore((s) => s.buy)
@@ -234,6 +236,14 @@ export function Hud() {
       {race.active && <div className="race-timer">{fmtMs(raceMs)} <span>RING {Math.min(race.idx + 1, 8)}/8</span></div>}
 
       {nearStation && !shopOpen && !dead && <div className="dock-prompt">⬡ DOCK AVAILABLE — PRESS G</div>}
+      {landPrompt && !dead && !surface && (
+        <div className="dock-prompt land">⬇ PRESS L TO LAND ON {landPrompt.toUpperCase()}</div>
+      )}
+      {surface && (
+        <div className="surface-tag">
+          📍 {SURFACES[surface].name}, {surface.toUpperCase()} — <span>climb or press L to leave</span>
+        </div>
+      )}
 
       {shopOpen && (
         <div className="shop">
