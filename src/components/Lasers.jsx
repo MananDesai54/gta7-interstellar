@@ -45,6 +45,7 @@ export function Lasers() {
               slot.ref.current.visible = false
               world.explode(slot.ref.current.position.clone(), '#ffaa33')
               s.addCash(50)
+              s.addKill()
               s.setWanted(s.wanted + 1)
             }
           }
@@ -58,6 +59,7 @@ export function Lasers() {
               c.alive = false
               world.explode(c.ref.current.position.clone(), '#88aaff')
               s.addCash(c.elite ? 350 : 150)
+              s.addKill()
               spawnPickup(c.ref.current.position, c.elite ? 100 : 50)
               s.setWanted(s.wanted + 1)
               s.killCop(id)
@@ -82,6 +84,7 @@ export function Lasers() {
                 s.onBossKilled()
               } else {
                 s.addCash(150)
+                s.addKill()
                 spawnPickup(slot.ref.current.position, 50)
                 if (Math.random() < 0.5) spawnPickup(slot.ref.current.position, 50)
               }
@@ -120,6 +123,7 @@ export function Lasers() {
                 if (sh.ref) sh.ref.visible = false
                 world.explode(tmp.clone(), '#f5c843')
                 s.addCash(100)
+                s.addKill()
               }
             }
           }

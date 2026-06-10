@@ -34,6 +34,7 @@ export function initPersistence(useStore) {
             bestMs: s.race.bestMs,
             ore: s.ore,
             discoveries: s.discoveries,
+            stats: s.stats,
           }),
         )
       } catch {}

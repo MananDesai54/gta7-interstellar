@@ -313,6 +313,19 @@ export function Hud() {
       {paused && (
         <div className="pause">
           <div className="pause-title">PAUSED</div>
+          <div className="pause-stats">
+            {(() => {
+              const st = useStore.getState().stats
+              return (
+                <>
+                  <div><b>{st.kills}</b><span>KILLS</span></div>
+                  <div><b>{st.deaths}</b><span>DEATHS</span></div>
+                  <div><b>{st.busts}</b><span>BUSTS</span></div>
+                  <div><b>${st.earned.toLocaleString()}</b><span>LIFETIME EARNED</span></div>
+                </>
+              )
+            })()}
+          </div>
           <button className="pause-btn" onClick={togglePause}>RESUME</button>
           <div className="pause-controls">
             <div><b>CLICK</b> mouse flight</div>

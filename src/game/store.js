@@ -32,6 +32,9 @@ export const useStore = create((set, get) => ({
   surface: null, // 'earth'|'mars'|'luna' while landed
   landPrompt: null, // body name when close enough to land
   surfaceJob: 0, // 0 none, 1 pickup set, 2 delivering
+  stats: { kills: 0, deaths: 0, earned: 0, busts: 0 },
+
+  addKill: () => set((s) => ({ stats: { ...s.stats, kills: s.stats.kills + 1 } })),
 
   setSurface: (surface) => set({ surface }),
   setLandPrompt: (landPrompt) => {
@@ -71,6 +74,7 @@ export const useStore = create((set, get) => ({
       patch.chapter = Math.min(save.chapter || 0, STORY.length)
       patch.ore = save.ore || 0
       patch.discoveries = save.discoveries || []
+      patch.stats = { kills: 0, deaths: 0, earned: 0, busts: 0, ...(save.stats || {}) }
     }
     patch.hp = maxHpFor(patch.upgrades || {})
     set(patch)
@@ -299,7 +303,11 @@ export const useStore = create((set, get) => ({
     }, 2200)
   },
 
-  addCash: (n) => set((s) => ({ cash: Math.max(0, s.cash + n) })),
+  addCash: (n) =>
+    set((s) => ({
+      cash: Math.max(0, s.cash + n),
+      stats: n > 0 ? { ...s.stats, earned: s.stats.earned + n } : s.stats,
+    })),
   setBoost: (boost) => set({ boost }),
   setWanted: (w) => set({ wanted: Math.max(0, Math.min(5, w)) }),
   nextStation: () => set((s) => ({ station: (s.station + 1) % STATIONS.length })),
@@ -325,7 +333,7 @@ export const useStore = create((set, get) => ({
   bust: () => {
     const s = get()
     if (s.dead || s.busted) return
-    set({ busted: true })
+    set((st) => ({ busted: true, stats: { ...st.stats, busts: st.stats.busts + 1 } }))
     world.playerVel.set(0, 0, 0)
     setTimeout(() => {
       const fine = Math.min(300, get().cash)
@@ -340,7 +348,7 @@ export const useStore = create((set, get) => ({
     if (get().dead) return
     world.explode(world.playerPos.clone(), '#ff5500')
     get().cancelRace()
-    set({ dead: true, deathReason: reason })
+    set((s) => ({ dead: true, deathReason: reason, stats: { ...s.stats, deaths: s.stats.deaths + 1 } }))
     setTimeout(() => {
       world.cops.clear()
       world.playerVel.set(0, 0, 0)
