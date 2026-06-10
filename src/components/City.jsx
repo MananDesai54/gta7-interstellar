@@ -6,7 +6,7 @@ import { CITY_POS, CITY_PAD } from '../game/constants'
 import { Model } from './Model'
 
 // ---- procedural textures (client-only) ----
-function windowTexture() {
+export function windowTexture() {
   const c = document.createElement('canvas')
   c.width = 64
   c.height = 128

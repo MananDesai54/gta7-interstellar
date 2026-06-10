@@ -5,6 +5,7 @@ import { useStore } from '../game/store'
 import { world, fireLaser } from '../game/world'
 import { SURFACES, surfaceProps } from '../game/surfaces'
 import { Model } from './Model'
+import { windowTexture } from './City'
 
 // The active planet surface. Mounted only while landed — a ground disc,
 // a sky dome with fog, per-planet props, and its own lighting.
@@ -125,6 +126,7 @@ const tmp2g = new THREE.Vector3()
 
 function EarthIsland({ props }) {
   const buildings = props.filter((p) => p.kind === 'building')
+  const winTex = useMemo(() => windowTexture(), [])
   return (
     <>
       {/* sand island under the city */}
@@ -135,7 +137,7 @@ function EarthIsland({ props }) {
       {buildings.map((b, i) => (
         <mesh key={i} position={[b.x, b.h / 2 + 2, b.z]}>
           <boxGeometry args={[b.w, b.h, b.d2]} />
-          <meshStandardMaterial color={b.c} roughness={0.85} />
+          <meshStandardMaterial color={b.c} roughness={0.85} emissive="#ffd9a0" emissiveMap={winTex} emissiveIntensity={0.55} />
         </mesh>
       ))}
       {/* breakers ring — reads as surf line */}
