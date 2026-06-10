@@ -334,3 +334,11 @@ body { font-family: var(--hud-font); }
 .pause-btn.prestige { border-color: #b08bff; color: #b08bff; background: rgba(176, 139, 255, 0.08); font-size: 12px; }
 .pause-btn.prestige:hover { background: rgba(176, 139, 255, 0.22); }
 .t-prestige { color: #b08bff; }
+
+/* ---------- five stars: the whole system wants you dead ---------- */
+.five-star-vignette { position: fixed; inset: 0; pointer-events: none; z-index: 42;
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(200, 20, 30, 0.28) 100%);
+  animation: five-pulse 0.9s ease-in-out infinite alternate; }
+@keyframes five-pulse { from { opacity: 0.35; } to { opacity: 1; } }
+.five-star-text { position: fixed; top: 12.5%; width: 100%; text-align: center; font-size: 15px; font-weight: 700;
+  letter-spacing: 8px; color: #ff3344; text-shadow: 2px 2px 0 #000; animation: blink 0.45s infinite; }

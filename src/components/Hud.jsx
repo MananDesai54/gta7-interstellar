@@ -272,6 +272,12 @@ export function Hud() {
       {gravWarn && !dead && <div className="grav-warn">⚠ GRAVITY WELL ⚠</div>}
       {flareWarn && !dead && <div className="flare-warn">☀ SOLAR FLARE INBOUND ☀</div>}
       {flare > 0 && <div className="flare-tint" />}
+      {wanted === 5 && !dead && (
+        <>
+          <div className="five-star-vignette" />
+          <div className="five-star-text">⚠ ALL UNITS — SHOOT ON SIGHT ⚠</div>
+        </>
+      )}
       {inBelt && !dead && <div className="belt-hint">ASTEROID COVER — HEAT FADES FAST</div>}
       <div className="crosshair">+</div>
 
