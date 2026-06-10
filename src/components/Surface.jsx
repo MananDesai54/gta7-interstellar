@@ -1,6 +1,8 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
+import { useFrame } from '@react-three/fiber'
 import { useStore } from '../game/store'
+import { world, fireLaser } from '../game/world'
 import { SURFACES, surfaceProps } from '../game/surfaces'
 import { Model } from './Model'
 
@@ -46,9 +48,80 @@ function SurfaceWorld({ id }) {
       {id === 'earth' && <EarthIsland props={props} />}
       {id === 'mars' && <MarsGulch props={props} />}
       {id === 'luna' && <LunaFlats props={props} />}
+      <Turrets cfg={cfg} />
     </group>
   )
 }
+
+// Claim-jumper defense turrets: they shoot first. $250 + a chip each.
+const TURRET_SPOTS = [
+  [820, 0, -380],
+  [-640, 0, 760],
+  [240, 0, 1240],
+]
+
+function Turrets({ cfg }) {
+  const tmp = useMemo(() => new THREE.Vector3(), [])
+  const entries = useMemo(
+    () =>
+      TURRET_SPOTS.map((pos) => ({
+        ref: { current: null },
+        data: { hp: 40, alive: true, respawnAt: 0, fireCd: 0, pos },
+      })),
+    [],
+  )
+
+  useEffect(() => {
+    world.turrets = entries
+    return () => {
+      world.turrets = []
+    }
+  }, [entries])
+
+  useFrame((state, dt) => {
+    const s = useStore.getState()
+    if (s.paused || s.dead || s.stage === 'dialogue') return
+    const t = state.clock.elapsedTime
+    for (const e of entries) {
+      const m = e.ref.current
+      if (!m) continue
+      if (!e.data.alive) {
+        if (t > e.data.respawnAt) {
+          e.data.alive = true
+          e.data.hp = 40
+          m.visible = true
+        }
+        continue
+      }
+      m.getWorldPosition(tmp)
+      const d = tmp.distanceTo(world.playerPos)
+      if (d < 700 && d > 40) {
+        m.lookAt(world.playerPos.x, m.position.y + cfg.y, world.playerPos.z)
+        e.data.fireCd -= dt
+        if (e.data.fireCd <= 0) {
+          e.data.fireCd = 1.8
+          const dir = tmp2g.copy(world.playerPos).sub(tmp).normalize()
+          dir.x += (Math.random() - 0.5) * 0.06
+          dir.y += (Math.random() - 0.5) * 0.06
+          dir.z += (Math.random() - 0.5) * 0.06
+          fireLaser(tmp.addScaledVector(dir, 20), dir, 'pirate')
+        }
+      }
+    }
+  })
+
+  return (
+    <>
+      {entries.map((e, i) => (
+        <group key={i} ref={(el) => (e.ref.current = el)} position={e.data.pos}>
+          <Model url="/models/turret_double.glb" scale={16} />
+          <pointLight color="#ff4433" intensity={20} distance={200} decay={1.7} position={[0, 30, 0]} />
+        </group>
+      ))}
+    </>
+  )
+}
+const tmp2g = new THREE.Vector3()
 
 function EarthIsland({ props }) {
   const buildings = props.filter((p) => p.kind === 'building')

@@ -34,6 +34,7 @@ export const world = {
   invulnUntil: 0, // respawn grace period (performance.now)
   surface: null, // mirrors store.surface for the frame loops
   landedBody: null, // which body we landed on, for the return-to-orbit
+  turrets: [], // surface defense turrets {ref, data:{hp, alive, ...}}
 
   // mission marker, anchored to an orbiting body when anchor is set
   mission: null,

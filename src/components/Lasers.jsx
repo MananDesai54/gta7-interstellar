@@ -91,6 +91,24 @@ export function Lasers() {
             }
           }
         }
+        // surface defense turrets
+        for (const e of world.turrets) {
+          if (!e.data.alive || !e.ref.current) continue
+          e.ref.current.getWorldPosition(tmp)
+          if (L.pos.distanceTo(tmp) < 24) {
+            e.data.hp -= 15
+            hit = true
+            if (e.data.hp <= 0) {
+              e.data.alive = false
+              e.data.respawnAt = t + 90
+              e.ref.current.visible = false
+              world.explode(tmp.clone(), '#ff7a22')
+              s.addCash(250)
+              s.addKill()
+              spawnPickup(tmp, 100)
+            }
+          }
+        }
         // ore rocks — crack them open
         for (const rock of world.asteroids) {
           if (!rock.ore || t < rock.oreReadyAt) continue
