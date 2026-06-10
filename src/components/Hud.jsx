@@ -44,6 +44,7 @@ export function Hud() {
   const [flash, setFlash] = useState(false)
   const [raceMs, setRaceMs] = useState(0)
   const [photoMode, setPhotoMode] = useState(false)
+  const [fareLeft, setFareLeft] = useState(0)
 
   // keys
   useEffect(() => {
@@ -127,6 +128,7 @@ export function Hud() {
       setInBelt(world.inBelt)
       setFlare(world.flare || 0)
       setFlareWarn(!!world.flareWarn)
+      setFareLeft(world.missionDeadline ? Math.max(0, world.missionDeadline - performance.now()) : 0)
       setWarpOn(world.warp > 0.5)
       setFlash(performance.now() - world.flashT < 220)
       const r = useStore.getState().race
@@ -212,6 +214,9 @@ export function Hud() {
       <div className="mission">
         <div className="m-title">{missionTitle}</div>
         <div className="m-body">{missionBody}</div>
+        {fareLeft > 0 && (
+          <div className={`fare-timer ${fareLeft < 15000 ? 'urgent' : ''}`}>⏱ {(fareLeft / 1000).toFixed(1)}s</div>
+        )}
       </div>
 
       <div className="stats">

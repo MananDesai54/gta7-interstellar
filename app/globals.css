@@ -321,3 +321,7 @@ body { font-family: var(--hud-font); }
 /* ---------- photo mode ---------- */
 .photo-hint { position: fixed; bottom: 18px; right: 22px; font-size: 11px; letter-spacing: 3px;
   color: rgba(255, 255, 255, 0.4); text-shadow: 1px 1px 0 #000; }
+
+/* ---------- ferry fare timer ---------- */
+.fare-timer { margin-top: 6px; font-family: var(--display); font-size: 26px; color: #ff7a22; text-shadow: 2px 2px 0 #000; }
+.fare-timer.urgent { color: #ff3322; animation: blink 0.4s infinite; }

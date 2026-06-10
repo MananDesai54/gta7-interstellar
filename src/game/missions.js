@@ -8,6 +8,10 @@ export const MISSIONS = [
   { pickup: 'Boost a data core from the derelict near Gargantua', from: 'gargantua', deliver: 'Fence it at Saturn station', to: 'saturn', pay: 1200 },
   { pickup: 'Skim coronal samples off Helios', from: 'helios', deliver: 'Deliver to the Mars lab', to: 'mars', pay: 1500 },
   { pickup: 'Pick up a "passenger" hiding near Saturn', from: 'saturn', deliver: 'Lose him near the black hole', to: 'gargantua', pay: 900 },
+  // ferry fares: the meter is running — blow the deadline, lose the fare
+  { pickup: 'Ferry a nervous banker from Earth orbit', from: 'earth', deliver: 'Mars departure gate, NOW', to: 'mars', pay: 1100, timed: 75 },
+  { pickup: 'Grab a Vega courtroom witness near Saturn', from: 'saturn', deliver: 'Earth marshal office before the trial', to: 'earth', pay: 1400, timed: 90 },
+  { pickup: 'Organ transplant pod at Mars', from: 'mars', deliver: 'Saturn med-station — it is on ice', to: 'saturn', pay: 1700, timed: 95 },
 ]
 
 function offsetFor(body) {
@@ -21,8 +25,9 @@ export function newMission(setMission) {
   world.mission = m
   world.missionPhase = 0
   world.markerHidden = false
+  world.missionDeadline = 0
   setAnchor({ body: m.from, offset: offsetFor(m.from) })
-  setMission('SIDE JOB', m.pickup + ' — follow the gold marker.')
+  setMission(m.timed ? 'FERRY FARE' : 'SIDE JOB', m.pickup + ' — follow the gold marker.')
 }
 
 export function advanceMission(store) {
@@ -31,11 +36,24 @@ export function advanceMission(store) {
   if (world.missionPhase === 0) {
     world.missionPhase = 1
     setAnchor({ body: m.to, offset: offsetFor(m.to) })
-    store.setMission('CARGO SECURED', m.deliver + ' — marker updated.')
-    store.showBanner('PICKUP COMPLETE')
+    if (m.timed) {
+      world.missionDeadline = performance.now() + m.timed * 1000
+      store.setMission('FERRY FARE', m.deliver + ` — ${m.timed}s on the clock. Overdrive (X).`)
+      store.showBanner('METER RUNNING — GO', '#ff7a22')
+    } else {
+      store.setMission('CARGO SECURED', m.deliver + ' — marker updated.')
+      store.showBanner('PICKUP COMPLETE')
+    }
   } else {
+    world.missionDeadline = 0
     store.addCash(m.pay)
     store.showBanner('MISSION PASSED — $' + m.pay, '#6dd96d')
     newMission(store.setMission)
   }
+}
+
+export function failMission(store) {
+  world.missionDeadline = 0
+  store.showBanner('FARE LOST — TOO SLOW', '#ff5544')
+  newMission(store.setMission)
 }

@@ -5,7 +5,7 @@ import { useKeyboardControls, Trail } from '@react-three/drei'
 import { Ship } from './Ship'
 import { world, fireLaser, setAnchor } from '../game/world'
 import { useStore } from '../game/store'
-import { advanceMission, newMission } from '../game/missions'
+import { advanceMission, newMission, failMission } from '../game/missions'
 import { STORY } from '../game/story'
 import { beep, setEngine } from '../game/audio'
 import { BODIES, applyGravity, bodyPos } from '../game/physics'
@@ -448,9 +448,14 @@ export function PlayerShip() {
             s.completeChapter()
           }
         }
-      } else if (s.stage === 'freeroam' && s.surfaceJob === 0 && world.mission && nearMarker) {
-        beep(world.missionPhase === 0 ? 990 : 1320, 0.2, 'sine')
-        advanceMission(s)
+      } else if (s.stage === 'freeroam' && s.surfaceJob === 0 && world.mission) {
+        if (world.missionDeadline && performance.now() > world.missionDeadline) {
+          beep(180, 0.4, 'sawtooth')
+          failMission(s)
+        } else if (nearMarker) {
+          beep(world.missionPhase === 0 ? 990 : 1320, 0.2, 'sine')
+          advanceMission(s)
+        }
       }
 
       // ---- wanted: cop spawns + heat decay + bust ----
