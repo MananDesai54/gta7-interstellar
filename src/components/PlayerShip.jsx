@@ -8,7 +8,8 @@ import { useStore } from '../game/store'
 import { advanceMission } from '../game/missions'
 import { STORY } from '../game/story'
 import { beep, setEngine } from '../game/audio'
-import { BODIES, applyGravity } from '../game/physics'
+import { BODIES, applyGravity, bodyPos } from '../game/physics'
+import { simNow } from '../game/net'
 import { thrustMultFor } from '../game/shop'
 import { BH_POS, CITY_POS, CITY_PAD } from '../game/constants'
 import { DOCK_RANGE } from './Station'
@@ -56,9 +57,23 @@ export function PlayerShip() {
     }
   }, [gl])
 
+  const spawnVelA = useMemo(() => new THREE.Vector3(), [])
+  const spawnVelB = useMemo(() => new THREE.Vector3(), [])
   const spawnAtEarth = (ship) => {
-    ship.position.copy(world.bodyPos.earth).add(tmp.set(0, 140, 760))
+    const offset = tmp.set(0, 140, 760)
+    ship.position.copy(world.bodyPos.earth).add(offset)
     ship.quaternion.identity()
+    // Earth's own orbital velocity...
+    const t = simNow()
+    bodyPos('earth', t, spawnVelA)
+    bodyPos('earth', t + 0.5, spawnVelB)
+    world.playerVel.copy(spawnVelB.sub(spawnVelA).multiplyScalar(2))
+    // ...plus a circular orbit around Earth, so an idle ship parks in LEO
+    // instead of being dragged down by gravity
+    const r = offset.length()
+    const vOrbit = Math.sqrt(BODIES.earth.gm / r)
+    spawnVelA.set(0, 1, 0).cross(offset).normalize() // tangent
+    world.playerVel.addScaledVector(spawnVelA, vOrbit)
   }
 
   useFrame((state, dt0) => {
@@ -149,7 +164,10 @@ export function PlayerShip() {
     setEngine(thrust > 0 ? Math.min(1, thrust / (520 * mult)) : 0, boosting || world.warp > 0.4)
 
     world.playerVel.addScaledVector(fwd, thrust * dt)
-    world.playerVel.multiplyScalar(1 - (0.35 + world.warp * 0.5) * dt)
+    // drag only bites while you fly the ship — a coasting ship keeps its
+    // orbit (and an AFK ship parks in one instead of falling out of the sky)
+    const steering = thrust !== 0 || k.left || k.right || k.pitchUp || k.pitchDown
+    world.playerVel.multiplyScalar(1 - ((steering ? 0.35 : 0.03) + world.warp * 0.5) * dt)
 
     // Newtonian gravity from every body — real pull, real slingshots
     const gravAccel = applyGravity(ship.position, world.playerVel, dt, world.bodyPos)

@@ -48,7 +48,7 @@ export default function Game() {
 
   useEffect(() => {
     if (process.env.NODE_ENV !== 'production') window.__game = { world, useStore }
-  }, [])
+  })
 
   return (
     <KeyboardControls map={KEYMAP}>

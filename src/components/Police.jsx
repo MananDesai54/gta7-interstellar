@@ -9,12 +9,14 @@ function Cop({ id }) {
   const ref = useRef()
   const siren = useRef()
   const tmp = useMemo(() => new THREE.Vector3(), [])
+  // INTERCEPTOR class rolls in at 4+ stars: faster, tougher, meaner
+  const elite = useMemo(() => useStore.getState().wanted >= 4 && Math.random() < 0.6, [])
 
   useEffect(() => {
-    const entry = { ref, hp: 60, alive: true, fireCd: 0, init: false }
+    const entry = { ref, hp: elite ? 100 : 60, alive: true, fireCd: 0, init: false, elite }
     world.cops.set(id, entry)
     return () => world.cops.delete(id)
-  }, [id])
+  }, [id, elite])
 
   useFrame((state, dt) => {
     const m = ref.current
@@ -35,11 +37,11 @@ function Cop({ id }) {
     tmp.copy(world.playerPos).sub(m.position)
     const d = tmp.length()
     m.lookAt(world.playerPos)
-    if (d > 120) m.position.addScaledVector(tmp.normalize(), (130 + s.wanted * 25) * dt)
+    if (d > 120) m.position.addScaledVector(tmp.normalize(), (130 + s.wanted * 25 + (elite ? 80 : 0)) * dt)
 
     entry.fireCd -= dt
     if (d < 700 && entry.fireCd <= 0 && !s.dead && s.started && s.stage !== 'dialogue') {
-      entry.fireCd = 1.1 - s.wanted * 0.12
+      entry.fireCd = (elite ? 0.8 : 1.1) - s.wanted * 0.12
       const dir = tmp.normalize().clone()
       dir.x += (Math.random() - 0.5) * 0.08
       dir.y += (Math.random() - 0.5) * 0.08
@@ -49,7 +51,13 @@ function Cop({ id }) {
   })
 
   return (
-    <Ship ref={ref} body="#e9e9f2" accent="#0a3bd1" engine="#7fb4ff">
+    <Ship
+      ref={ref}
+      body={elite ? '#101218' : '#e9e9f2'}
+      accent={elite ? '#ff2222' : '#0a3bd1'}
+      engine={elite ? '#ff5555' : '#7fb4ff'}
+      scale={elite ? 1.15 : 1}
+    >
       <pointLight ref={siren} color="#ff2230" intensity={60} distance={260} decay={1.4} position={[0, 7, 0]} />
     </Ship>
   )

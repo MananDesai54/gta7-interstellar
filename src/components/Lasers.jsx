@@ -57,7 +57,8 @@ export function Lasers() {
             if (c.hp <= 0) {
               c.alive = false
               world.explode(c.ref.current.position.clone(), '#88aaff')
-              s.addCash(150)
+              s.addCash(c.elite ? 350 : 150)
+              spawnPickup(c.ref.current.position, c.elite ? 100 : 50)
               s.setWanted(s.wanted + 1)
               s.killCop(id)
               s.onCopKilled()

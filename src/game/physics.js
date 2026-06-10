@@ -3,14 +3,20 @@ import * as THREE from 'three'
 // Gameplay-scaled Newtonian gravity. Planets ride analytic orbits (on rails,
 // KSP-style) around Helios; the ship feels inverse-square pull from every
 // body, so slingshots and decaying orbits are real.
+// Orbital periods are Kepler-consistent with the gravity field
+// (T = 2π·√(a³/GM_parent)), so the rails agree with what the ship feels —
+// you can genuinely park in orbit around a planet and stay there.
+const kepler = (a, gm) => 2 * Math.PI * Math.sqrt(a ** 3 / gm)
+const GM_SUN = 9.0e7
+
 export const BODIES = {
-  helios: { radius: 700, gm: 9.0e7, killR: 770, fixed: [0, 0, 0] },
-  mars: { radius: 200, gm: 1.5e6, bounceR: 215, orbit: { a: 2000, period: 320, phase: 2.1, incl: 0.05 } },
-  earth: { radius: 320, gm: 4.0e6, bounceR: 338, orbit: { a: 2900, period: 480, phase: 0.4, incl: 0.03 } },
-  luna: { radius: 85, gm: 2.5e5, bounceR: 95, orbit: { a: 640, period: 75, phase: 1.2, incl: 0.18, parent: 'earth' } },
-  saturn: { radius: 480, gm: 8.0e6, bounceR: 500, orbit: { a: 4300, period: 900, phase: 4.2, incl: 0.08 } },
+  helios: { radius: 700, gm: GM_SUN, killR: 770, fixed: [0, 0, 0] },
+  mars: { radius: 200, gm: 1.5e6, bounceR: 215, orbit: { a: 2000, period: kepler(2000, GM_SUN), phase: 2.1, incl: 0.05 } },
+  earth: { radius: 320, gm: 4.0e6, bounceR: 338, orbit: { a: 2900, period: kepler(2900, GM_SUN), phase: 0.4, incl: 0.03 } },
+  luna: { radius: 85, gm: 2.5e5, bounceR: 95, orbit: { a: 900, period: kepler(900, 4.0e6), phase: 1.2, incl: 0.18, parent: 'earth' } },
+  saturn: { radius: 480, gm: 8.0e6, bounceR: 500, orbit: { a: 4300, period: kepler(4300, GM_SUN), phase: 4.2, incl: 0.08 } },
   gargantua: { radius: 260, gm: 2.2e8, killR: 300, fixed: [-1400, 350, -5800] },
-  comet: { radius: 38, gm: 0, orbit: { ellipse: true, a: 5400, e: 0.58, period: 1500, phase: 2.6, incl: 0.2 } },
+  comet: { radius: 38, gm: 0, orbit: { ellipse: true, a: 5400, e: 0.58, period: kepler(5400, GM_SUN), phase: 2.6, incl: 0.2 } },
 }
 
 export const BODY_NAMES = Object.keys(BODIES)
