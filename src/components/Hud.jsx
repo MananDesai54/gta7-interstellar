@@ -45,6 +45,7 @@ export function Hud() {
   const [raceMs, setRaceMs] = useState(0)
   const [photoMode, setPhotoMode] = useState(false)
   const [fareLeft, setFareLeft] = useState(0)
+  const mapZoom = useRef(1) // M cycles 0.45 / 1 / 2.2
 
   // keys
   useEffect(() => {
@@ -62,6 +63,10 @@ export function Hud() {
       if (e.code === 'KeyG' && !s.paused) s.toggleShop()
       if (e.code === 'KeyJ' && !s.paused) s.toggleLog()
       if (e.code === 'KeyH' && !s.paused) setPhotoMode((v) => !v)
+      if (e.code === 'KeyM' && !s.paused) {
+        mapZoom.current = mapZoom.current === 1 ? 2.2 : mapZoom.current === 2.2 ? 0.45 : 1
+        beep(540, 0.06, 'sine')
+      }
       if (e.code === 'Escape') {
         if (s.shopOpen) s.toggleShop()
         else if (s.showLog) s.toggleLog()
@@ -149,7 +154,7 @@ export function Hud() {
       if (!ctx) return
       const W = 190
       const cx = W / 2
-      const scale = cx / MAP_R
+      const scale = (cx / MAP_R) * mapZoom.current
       ctx.clearRect(0, 0, W, W)
       ctx.save()
       ctx.beginPath()
@@ -364,6 +369,7 @@ export function Hud() {
             <div><b>G</b> dock</div>
             <div><b>J</b> galaxy log</div>
             <div><b>H</b> photo mode</div>
+            <div><b>M</b> map zoom</div>
             <div><b>R</b> radio</div>
           </div>
           <button className="pause-btn danger" onClick={newGame}>NEW GAME (WIPE SAVE)</button>
