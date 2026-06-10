@@ -8,7 +8,6 @@ import { useStore } from '../game/store'
 import { advanceMission } from '../game/missions'
 import { STORY } from '../game/story'
 import { beep, setEngine } from '../game/audio'
-import { sendState, sendFire } from '../game/net'
 import { BODIES, applyGravity } from '../game/physics'
 import { thrustMultFor } from '../game/shop'
 import { BH_POS } from '../game/constants'
@@ -166,7 +165,6 @@ export function PlayerShip() {
       muzzleFlip.current = !muzzleFlip.current
       const muzzle = tmp.copy(ship.position).addScaledVector(fwd, 20).addScaledVector(side, lateral)
       fireLaser(muzzle, fwd, 'friendly')
-      sendFire(muzzle, fwd)
     }
 
     // ---- objectives ----
@@ -218,7 +216,6 @@ export function PlayerShip() {
 
     world.playerPos.copy(ship.position)
     world.playerQuat.copy(ship.quaternion)
-    sendState(dt, ship.position, ship.quaternion)
   })
 
   return <Ship ref={ref} body="#15151a" accent={paint} position={[0, 0, 600]} />

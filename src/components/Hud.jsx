@@ -5,7 +5,6 @@ import { world } from '../game/world'
 import { STATIONS } from '../game/constants'
 import { MAP_R } from '../game/physics'
 import { SHOP, PAINTS, maxHpFor } from '../game/shop'
-import { net } from '../game/net'
 import { beep, startRadio } from '../game/audio'
 
 const fwdTmp = new THREE.Vector3()
@@ -18,8 +17,8 @@ function fmtMs(ms) {
 export function Hud() {
   const {
     started, dead, deathReason, hp, boost, cash, wanted,
-    missionTitle, missionBody, banner, station, dialogue, lineIdx, remoteIds,
-    shopOpen, nearStation, showLeaderboard, leaderboard, race, upgrades, paint,
+    missionTitle, missionBody, banner, station, dialogue, lineIdx,
+    shopOpen, nearStation, race, upgrades, paint,
   } = useStore()
   const nextStation = useStore((s) => s.nextStation)
   const buy = useStore((s) => s.buy)
@@ -30,7 +29,7 @@ export function Hud() {
   const [inBelt, setInBelt] = useState(false)
   const [raceMs, setRaceMs] = useState(0)
 
-  // keys: radio, dialogue advance, dock, leaderboard
+  // keys: radio, dialogue advance, dock
   useEffect(() => {
     const onKey = (e) => {
       const s = useStore.getState()
@@ -44,7 +43,6 @@ export function Hud() {
         s.advanceLine()
       }
       if (e.code === 'KeyG') s.toggleShop()
-      if (e.code === 'KeyL') s.toggleLeaderboard()
       if (e.code === 'Escape' && s.shopOpen) s.toggleShop()
     }
     addEventListener('keydown', onKey)
@@ -96,7 +94,6 @@ export function Hud() {
       if (!world.markerHidden) dot(world.missionPos, '#ffd24a', 4)
       world.npcs.forEach((n) => n?.data.alive && n.ref.current && dot(n.ref.current.position, '#bbb', 2))
       world.cops.forEach((c) => c.alive && c.ref.current && dot(c.ref.current.position, '#f33', 2.5))
-      world.remoteRefs.forEach((rr) => rr.current?.visible && dot(rr.current.position, '#41d6ff', 3.5))
       if (world.convoy?.groupRef.current) {
         world.convoy.ships.forEach((sh) => {
           if (!sh.alive) return
@@ -126,12 +123,6 @@ export function Hud() {
       <div className="mission">
         <div className="m-title">{missionTitle}</div>
         <div className="m-body">{missionBody}</div>
-        {remoteIds.length > 0 && (
-          <div className="pilots-online">
-            {remoteIds.length} other pilot{remoteIds.length > 1 ? 's' : ''}:{' '}
-            {remoteIds.map((id) => net.remotes.get(id)?.name).filter(Boolean).join(', ')}
-          </div>
-        )}
       </div>
 
       <div className="stats">
@@ -198,22 +189,6 @@ export function Hud() {
             ))}
           </div>
           <div className="shop-hint">G / ESC to undock</div>
-        </div>
-      )}
-
-      {showLeaderboard && (
-        <div className="leaderboard">
-          <div className="lb-title">SYSTEM LEADERBOARD</div>
-          {leaderboard.length === 0 && <div className="lb-row"><span>no pilots ranked yet</span></div>}
-          {leaderboard.map((e, i) => (
-            <div key={e.name} className="lb-row">
-              <span className="lb-rank">{i + 1}</span>
-              <span className="lb-name">{e.name}</span>
-              <span className="lb-cash">${(e.cash || 0).toLocaleString()}</span>
-              <span className="lb-race">{fmtMs(e.bestMs)}</span>
-            </div>
-          ))}
-          <div className="shop-hint">L to close</div>
         </div>
       )}
 

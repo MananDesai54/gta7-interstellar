@@ -14,10 +14,9 @@ export const world = {
   simTime: 0, // shared-epoch seconds, drives orbits
   bodyPos: Object.fromEntries(BODY_NAMES.map((n) => [n, new THREE.Vector3()])),
 
-  lasers: [], // {pos, vel, life, kind: 'friendly'|'cop'|'remote'}
+  lasers: [], // {pos, vel, life, kind: 'friendly'|'cop'}
   npcs: [],
   cops: new Map(),
-  remoteRefs: new Map(), // socket id -> group ref (for PvP hit detection)
 
   asteroids: [], // {pos: Vector3, r} — filled by AsteroidBelt
   inBelt: false,
@@ -50,5 +49,5 @@ export function fireLaser(pos, dir, kind) {
     kind,
   })
   const dist = kind === 'friendly' ? 0 : pos.distanceTo(world.playerPos)
-  beep(kind === 'friendly' ? 880 : kind === 'remote' ? 700 : 440, 0.08, 'square', dist)
+  beep(kind === 'friendly' ? 880 : 440, 0.08, 'square', dist)
 }

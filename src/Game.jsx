@@ -14,7 +14,6 @@ import { Station } from './components/Station'
 import { RaceCourse } from './components/RaceCourse'
 import { Convoy } from './components/Convoy'
 import { PlayerShip } from './components/PlayerShip'
-import { RemotePlayers } from './components/RemotePlayers'
 import { Traffic } from './components/Traffic'
 import { Police } from './components/Police'
 import { Lasers } from './components/Lasers'
@@ -68,7 +67,6 @@ export default function Game() {
           <RaceCourse />
           <Convoy />
           <PlayerShip />
-          <RemotePlayers />
           <Traffic />
           <Police />
           <Lasers />

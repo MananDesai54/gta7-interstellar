@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useStore } from '../game/store'
 import { initAudio, beep } from '../game/audio'
-import { connect } from '../game/net'
 
 export function TitleScreen() {
   const started = useStore((s) => s.started)
@@ -20,7 +19,6 @@ export function TitleScreen() {
     const pilot = (name.trim() || 'DRIFTER').toUpperCase()
     initAudio()
     beep(660, 0.15, 'sine')
-    connect(pilot)
     useStore.getState().start(pilot)
   }
 
@@ -32,8 +30,8 @@ export function TitleScreen() {
       <div className="title-inner">
         <div className="t-kicker">ROCKSTAR GALACTIC PRESENTS</div>
         <h1 className="t-gta">GTA&nbsp;VII</h1>
-        <h2 className="t-sub">INTERSTELLAR ONLINE</h2>
-        <p className="t-tag">The Sagittarius System. Real gravity. Real cops. Real friends to betray.</p>
+        <h2 className="t-sub">INTERSTELLAR</h2>
+        <p className="t-tag">The Sagittarius System. Real gravity. Real cops. Nowhere soft to land.</p>
         <input
           className="t-name"
           placeholder="PILOT NAME"

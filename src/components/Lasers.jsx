@@ -4,7 +4,6 @@ import { useFrame } from '@react-three/fiber'
 import { world } from '../game/world'
 import { useStore } from '../game/store'
 import { beep } from '../game/audio'
-import { sendPvpHit } from '../game/net'
 
 const POOL = 80
 
@@ -13,7 +12,6 @@ laserGeo.rotateX(Math.PI / 2)
 const MATS = {
   friendly: new THREE.MeshBasicMaterial({ color: '#ff3344', toneMapped: false }),
   cop: new THREE.MeshBasicMaterial({ color: '#3d8bff', toneMapped: false }),
-  remote: new THREE.MeshBasicMaterial({ color: '#ffd24a', toneMapped: false }),
 }
 
 export function Lasers() {
@@ -84,21 +82,11 @@ export function Lasers() {
             }
           }
         }
-        // PvP: my laser clipping another pilot — tell the server, they take it
-        for (const [id, rref] of world.remoteRefs) {
-          if (!rref.current || !rref.current.visible) continue
-          if (L.pos.distanceTo(rref.current.position) < 18) {
-            hit = true
-            world.explode(L.pos.clone(), '#ff5fa8')
-            sendPvpHit(id)
-          }
-        }
       } else if (L.kind === 'cop' && !s.dead && s.started && L.pos.distanceTo(world.playerPos) < 16) {
         hit = true
         beep(180, 0.1)
         s.damage(8, 'Smoked by space cops.')
       }
-      // 'remote' lasers are cosmetic here — damage arrives via the server
 
       if (hit || L.life <= 0) world.lasers.splice(i, 1)
     }

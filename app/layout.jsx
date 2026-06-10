@@ -1,8 +1,8 @@
 import './globals.css'
 
 export const metadata = {
-  title: 'GTA VII: INTERSTELLAR ONLINE',
-  description: 'Open-world space crime in the Sagittarius System. Multiplayer.',
+  title: 'GTA VII: INTERSTELLAR',
+  description: 'Open-world space crime in the Sagittarius System.',
 }
 
 export default function RootLayout({ children }) {

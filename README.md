@@ -1,6 +1,6 @@
-# GTA VII: INTERSTELLAR ONLINE
+# GTA VII: INTERSTELLAR
 
-Multiplayer open-world space crime in the Sagittarius System. Next.js + React Three Fiber + Socket.IO.
+Open-world space crime in the Sagittarius System. Next.js + React Three Fiber. Single-player, deploys anywhere Next.js runs — including Vercel.
 
 ![title](shots/title.png)
 ![dialogue](shots/dialogue.png)
@@ -12,13 +12,7 @@ npm install
 npm run dev        # http://localhost:3000
 ```
 
-Multiplayer over the internet:
-
-```sh
-ngrok http 3000    # share the URL — Next.js pages and the Socket.IO lobby ride the same port
-```
-
-Everyone who opens the link spawns in the same solar system (server shares one orbital epoch, so the planets line up for the whole lobby). You see other pilots' ships, name tags, and laser fire. Friendly fire is on.
+Deploy: standard Next.js app — `vercel`, or `npm run build && npm start`.
 
 ## Story mode — THE DRIFT
 
@@ -44,15 +38,13 @@ Finish the story to unlock endless free-roam side jobs. Dying restarts the activ
 - **Asteroid belt** between Mars and Earth orbits — collide and you crater, but heat decays 3× faster inside (police can't track you through the rocks)
 - **Trajectory preview** — cyan line predicts your path through the gravity field, KSP-style. Read it to line up slingshots
 - **Meridian Station** rides Earth orbit — fly close, press **G** to dock at the garage: armor, boost tanks, engine tunes, dual cannons, paint jobs
-- **Saturn Circuit** — fly through the cyan gate near Saturn to start a time trial: 7 rings + return. Best times hit the leaderboard
+- **Saturn Circuit** — fly through the cyan gate near Saturn to start a time trial: 7 rings + return. Best lap saved
 - **Smuggler convoys** cross the system every couple of minutes — wipe all three gold haulers for $1,000 (and a 2-star spike)
-- **Bounty PvP** — kill another pilot and you take half their cash
 - **Sound** — engine hum follows the throttle, lasers fall off with distance, and each radio station plays its own procedural loop (R to dial)
 
 ## Persistence (no database)
 
-- Your save (cash, story progress, upgrades, paint, best lap) → `localStorage`, restored on reload
-- Shared leaderboard (press **L**) → server memory flushed to `data/leaderboard.json`
+Your save — cash, story progress, upgrades, paint, best lap — lives in `localStorage` and restores on reload.
 
 ## Controls
 
@@ -66,16 +58,16 @@ Finish the story to unlock endless free-roam side jobs. Dying restarts the activ
 | Space | lasers |
 | R | radio |
 | G | dock / undock at station |
-| L | leaderboard |
 | Enter | advance dialogue / start |
 
 ## Architecture
 
-- `server.js` — custom Next server + Socket.IO lobby (join/state/fire/pvp-hit relay, shared orbit epoch)
 - `src/game/physics.js` — body table, Kepler orbit positions, summed gravity
 - `src/game/world.js` — mutable 60fps state (no React renders)
-- `src/game/store.js` — zustand: HUD, story progression, multiplayer roster
+- `src/game/store.js` — zustand: HUD, story progression, garage, races
 - `src/game/story.js` — chapters, dialogue, objective definitions
 - `src/components/` — R3F scene: textured planets, shader accretion disk, procedural ships, laser/explosion pools
 
 In dev, `window.__game = { world, useStore }` for debugging.
+
+> Multiplayer (Socket.IO lobby, PvP bounties, shared leaderboard) was removed in this version — it lives at commit `837b7b1` if you ever want it back.

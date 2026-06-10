@@ -22,20 +22,13 @@ export const useStore = create((set, get) => ({
   station: 0,
   cops: [],
 
-  // multiplayer
   pilotName: 'DRIFTER',
-  remoteIds: [],
-  leaderboard: [],
-  lastAttackerId: null,
-  setRemoteIds: (remoteIds) => set({ remoteIds }),
-  setLeaderboard: (leaderboard) => set({ leaderboard }),
 
   // garage
   upgrades: {},
   paint: '#ff7a00',
   shopOpen: false,
   nearStation: false,
-  showLeaderboard: false,
 
   // races
   race: { active: false, idx: 0, t0: 0, lastMs: null, bestMs: null },
@@ -200,7 +193,6 @@ export const useStore = create((set, get) => ({
     if (!p || s.cash < p.cost) return
     set({ cash: s.cash - p.cost, paint: p.color })
   },
-  toggleLeaderboard: () => set((s) => ({ showLeaderboard: !s.showLeaderboard })),
 
   // ---- races ----
   startRace: () => {
@@ -266,24 +258,16 @@ export const useStore = create((set, get) => ({
       world.playerVel.set(0, 0, 0)
       world.resetPlayer = true
       const s = get()
-      // PvP death: killer takes half your roll. Otherwise $200 dry-dock fee.
-      const isPvp = s.lastAttackerId && reason.startsWith('Dusted')
-      const lost = isPvp ? Math.floor(s.cash / 2) : 200
-      if (isPvp && get().reportPvpDeath) get().reportPvpDeath(s.lastAttackerId, lost)
       set({
         dead: false,
         hp: get().maxHp(),
         boost: get().maxBoost(),
         wanted: 0,
         cops: [],
-        cash: Math.max(0, s.cash - lost),
-        lastAttackerId: null,
+        cash: Math.max(0, s.cash - 200),
       })
       if (s.stage === 'active' && s.chapter < STORY.length) get().beginObjective()
-      else get().setMission('BACK IN ACTION', reason + (isPvp ? ` Lost $${lost}.` : ' Dry-dock fee: $200.'))
+      else get().setMission('BACK IN ACTION', reason + ' Dry-dock fee: $200.')
     }, 3200)
   },
-
-  // injected by net.js to avoid an import cycle
-  reportPvpDeath: null,
 }))

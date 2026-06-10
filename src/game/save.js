@@ -1,5 +1,4 @@
-// No-DB persistence: one localStorage slot per browser. The shared leaderboard
-// lives on the game server as a JSON file — see server.js.
+// No-DB persistence: one localStorage slot per browser.
 const KEY = 'gta7-interstellar-save'
 
 export function loadSave() {
