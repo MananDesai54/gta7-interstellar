@@ -78,6 +78,18 @@ export function Hud() {
     if (started) startRadio(station)
   }, [started, station])
 
+  // controller hotplug toasts
+  useEffect(() => {
+    const on = () => useStore.getState().showBanner('🎮 CONTROLLER CONNECTED', '#7ec8ff')
+    const off = () => useStore.getState().showBanner('🎮 CONTROLLER LOST', '#ff7a22')
+    addEventListener('gamepadconnected', on)
+    addEventListener('gamepaddisconnected', off)
+    return () => {
+      removeEventListener('gamepadconnected', on)
+      removeEventListener('gamepaddisconnected', off)
+    }
+  }, [])
+
   // fast loop: waypoint projection (smooth) — direct DOM writes, no re-render
   useEffect(() => {
     let raf

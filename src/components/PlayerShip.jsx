@@ -19,6 +19,30 @@ import { RING_TILT } from './Planets'
 const BOUNCY = ['earth', 'saturn', 'mars', 'luna']
 const RING_Q_INV = new THREE.Quaternion().setFromEuler(new THREE.Euler(RING_TILT, 0, 0)).invert()
 
+// gamepad: left stick = yaw/pitch, bumpers = roll, RT = thrust, LT = brake,
+// A = fire, B = boost, Y = overdrive, X = land, Start = pause
+const DEAD = 0.14
+const dz = (v) => (Math.abs(v) > DEAD ? v : 0)
+function readPad() {
+  if (typeof navigator === 'undefined' || !navigator.getGamepads) return null
+  const pad = [...navigator.getGamepads()].find((p) => p && p.connected)
+  if (!pad) return null
+  const b = (i) => pad.buttons[i]?.pressed || false
+  const v = (i) => pad.buttons[i]?.value || 0
+  return {
+    yaw: -dz(pad.axes[0] || 0),
+    pitch: dz(pad.axes[1] || 0),
+    roll: (b(4) ? 1 : 0) - (b(5) ? 1 : 0),
+    thrust: v(7),
+    brake: v(6),
+    fire: b(0),
+    boost: b(1),
+    warp: b(3),
+    land: b(2),
+    pause: b(9),
+  }
+}
+
 function randSurfacePoint(cfg, out) {
   const a = Math.random() * Math.PI * 2
   const d = 250 + Math.random() * 1300
@@ -40,6 +64,7 @@ export function PlayerShip() {
   const decay = useRef(0)
   const bustT = useRef(0)
   const landHeld = useRef(false)
+  const pauseHeld = useRef(false)
   const boostLocal = useRef(100)
   const spawned = useRef(false)
   const muzzleFlip = useRef(false)
@@ -171,7 +196,25 @@ export function PlayerShip() {
       return
     }
 
-    const k = getKeys()
+    const kb = getKeys()
+    const pad = readPad()
+    // merge keyboard + gamepad into one control set
+    const k = {
+      ...kb,
+      fire: kb.fire || pad?.fire,
+      boost: kb.boost || pad?.boost,
+      warp: kb.warp || pad?.warp,
+      land: kb.land || pad?.land,
+      forward: kb.forward || (pad?.thrust || 0) > 0.05,
+      back: kb.back || (pad?.brake || 0) > 0.05,
+    }
+    if (pad?.pause && !pauseHeld.current) {
+      pauseHeld.current = true
+      s.togglePause()
+      return
+    }
+    if (!pad?.pause) pauseHeld.current = false
+
     const freeze = s.stage === 'dialogue' || s.shopOpen
     if (freeze && document.pointerLockElement) document.exitPointerLock()
 
@@ -197,9 +240,9 @@ export function PlayerShip() {
       const mx = world.mouse.dx
       const my = world.mouse.dy
       world.mouse.dx = world.mouse.dy = 0
-      ship.rotateY(-mx * 0.0021 + ((k.left ? 1 : 0) - (k.right ? 1 : 0)) * 1.6 * dt)
-      ship.rotateX(-my * 0.0019 + ((k.pitchDown ? 1 : 0) - (k.pitchUp ? 1 : 0)) * 1.3 * dt)
-      ship.rotateZ(((k.rollL ? 1 : 0) - (k.rollR ? 1 : 0)) * 1.8 * dt)
+      ship.rotateY(-mx * 0.0021 + (((k.left ? 1 : 0) - (k.right ? 1 : 0)) + (pad?.yaw || 0)) * 1.6 * dt)
+      ship.rotateX(-my * 0.0019 + (((k.pitchDown ? 1 : 0) - (k.pitchUp ? 1 : 0)) + (pad?.pitch || 0)) * 1.3 * dt)
+      ship.rotateZ((((k.rollL ? 1 : 0) - (k.rollR ? 1 : 0)) + (pad?.roll || 0)) * 1.8 * dt)
     } else {
       world.mouse.dx = world.mouse.dy = 0
     }
@@ -212,7 +255,7 @@ export function PlayerShip() {
     let thrust = 0
     let boosting = false
     if (!freeze) {
-      if (k.forward) thrust = 220 * mult
+      if (k.forward) thrust = 220 * mult * (pad?.thrust && !kb.forward ? pad.thrust : 1)
       if (k.back) thrust = -120 * mult
       boosting = k.boost && k.forward && boostLocal.current > 0
       if (boosting) {
