@@ -43,6 +43,7 @@ export function Hud() {
   const [warpOn, setWarpOn] = useState(false)
   const [flash, setFlash] = useState(false)
   const [raceMs, setRaceMs] = useState(0)
+  const [photoMode, setPhotoMode] = useState(false)
 
   // keys
   useEffect(() => {
@@ -59,6 +60,7 @@ export function Hud() {
       }
       if (e.code === 'KeyG' && !s.paused) s.toggleShop()
       if (e.code === 'KeyJ' && !s.paused) s.toggleLog()
+      if (e.code === 'KeyH' && !s.paused) setPhotoMode((v) => !v)
       if (e.code === 'Escape') {
         if (s.shopOpen) s.toggleShop()
         else if (s.showLog) s.toggleLog()
@@ -186,6 +188,14 @@ export function Hud() {
   }, [])
 
   if (!started) return null
+
+  if (photoMode) {
+    return (
+      <div className="hud">
+        <div className="photo-hint">📷 PHOTO MODE — H to exit</div>
+      </div>
+    )
+  }
 
   const line = dialogue?.[lineIdx]
   const maxHp = maxHpFor(upgrades)
@@ -333,8 +343,10 @@ export function Hud() {
             <div><b>SHIFT</b> boost</div>
             <div><b>X</b> overdrive</div>
             <div><b>SPACE</b> lasers</div>
+            <div><b>L</b> land / lift off</div>
             <div><b>G</b> dock</div>
             <div><b>J</b> galaxy log</div>
+            <div><b>H</b> photo mode</div>
             <div><b>R</b> radio</div>
           </div>
           <button className="pause-btn danger" onClick={newGame}>NEW GAME (WIPE SAVE)</button>
