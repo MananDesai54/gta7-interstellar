@@ -14,8 +14,10 @@ import { BH_POS, CITY_POS, CITY_PAD } from '../game/constants'
 import { DOCK_RANGE } from './Station'
 import { BELT_A, BELT_SPREAD } from './AsteroidBelt'
 import { SURFACES, LANDABLE, SURFACE_CEILING, SURFACE_SPAWN_ALT } from '../game/surfaces'
+import { RING_TILT } from './Planets'
 
 const BOUNCY = ['earth', 'saturn', 'mars', 'luna']
+const RING_Q_INV = new THREE.Quaternion().setFromEuler(new THREE.Euler(RING_TILT, 0, 0)).invert()
 
 function randSurfacePoint(cfg, out) {
   const a = Math.random() * Math.PI * 2
@@ -353,6 +355,21 @@ export function PlayerShip() {
             s.damage(8, 'Became a billboard on a Neo Vega tower.')
             break
           }
+        }
+      }
+
+      // Saturn's rings grind hulls — the CH2 warning was real
+      tmp.copy(ship.position).sub(world.bodyPos.saturn).applyQuaternion(RING_Q_INV)
+      const ringRad = Math.hypot(tmp.x, tmp.y)
+      const R_SAT = BODIES.saturn.radius
+      if (Math.abs(tmp.z) < 26 && ringRad > R_SAT * 1.28 && ringRad < R_SAT * 2.12) {
+        world.playerVel.multiplyScalar(1 - 0.5 * dt)
+        world.shake = Math.min(1, world.shake + 0.8 * dt)
+        if ((world.ringDmg = (world.ringDmg || 0) + 5 * dt) >= 1) {
+          const n = Math.floor(world.ringDmg)
+          world.ringDmg -= n
+          beep(140, 0.06, 'sawtooth')
+          s.damage(n, "Sandblasted by Saturn's rings.")
         }
       }
 

@@ -1,9 +1,11 @@
-import { useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
 import { useFrame } from '@react-three/fiber'
 import { useTexture } from '@react-three/drei'
 import { world } from '../game/world'
 import { BODIES } from '../game/physics'
+
+export const RING_TILT = Math.PI / 2.25
 
 const T = {
   earth: 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_atmos_2048.jpg',
@@ -76,15 +78,48 @@ function Saturn() {
   useFrame((_, dt) => {
     if (planet.current) planet.current.rotation.y += dt * 0.015
   })
+  // physical ring debris — chunky rocks scattered through the ring annulus
+  const debris = useRef()
+  const chunks = useMemo(() => {
+    const arr = []
+    for (let i = 0; i < 140; i++) {
+      const a = Math.random() * Math.PI * 2
+      const rad = R * (1.32 + Math.random() * 0.74)
+      arr.push({
+        x: Math.cos(a) * rad,
+        y: Math.sin(a) * rad, // ring geo lives in XY before the tilt
+        z: (Math.random() - 0.5) * 18,
+        s: 3 + Math.random() * 11,
+        r: Math.random() * Math.PI,
+      })
+    }
+    return arr
+  }, [R])
+  useEffect(() => {
+    const m = debris.current
+    if (!m) return
+    const M = new THREE.Matrix4()
+    const q = new THREE.Quaternion()
+    chunks.forEach((c, i) => {
+      q.setFromEuler(new THREE.Euler(c.r, c.r * 2, 0))
+      M.compose(new THREE.Vector3(c.x, c.y, c.z), q, new THREE.Vector3(c.s, c.s * 0.8, c.s))
+      m.setMatrixAt(i, M)
+    })
+    m.instanceMatrix.needsUpdate = true
+  }, [chunks])
   return (
     <group ref={group}>
       <mesh ref={planet}>
         <sphereGeometry args={[R, 64, 48]} />
         <meshStandardMaterial map={map} roughness={0.95} />
       </mesh>
-      <mesh geometry={ringGeo} rotation-x={Math.PI / 2.25}>
+      <mesh geometry={ringGeo} rotation-x={RING_TILT}>
         <meshBasicMaterial map={ringColor} alphaMap={ringAlpha} transparent opacity={0.95} side={THREE.DoubleSide} depthWrite={false} />
       </mesh>
+      <instancedMesh ref={debris} args={[undefined, undefined, chunks.length]} rotation-x={RING_TILT} frustumCulled={false}>
+        <dodecahedronGeometry args={[1, 0]} />
+        <meshStandardMaterial color="#b09a78" roughness={1} flatShading />
+      </instancedMesh>
     </group>
   )
 }
