@@ -109,10 +109,16 @@ function Astronaut() {
     bob.current += dt * (Math.abs(move) > 0 ? (k.boost ? 14 : 9) : 0)
     m.children[0] && (m.children[0].position.y = grounded && move ? Math.abs(Math.sin(bob.current)) * 0.7 : 0)
 
-    // third-person camera
-    camTarget.copy(m.position).addScaledVector(fwd, -26).add(tmp.set(0, 13, 0))
+    // GTA-style third person: pulled back, raised, slight right-shoulder
+    // offset — the astronaut stays fully in frame lower-center
+    const right = tmp.set(1, 0, 0).applyQuaternion(m.quaternion)
+    camTarget
+      .copy(m.position)
+      .addScaledVector(fwd, -44)
+      .addScaledVector(right, 7)
+      .add(new THREE.Vector3(0, 20, 0))
     camera.position.lerp(camTarget, 1 - Math.exp(-8 * dt))
-    tmp.copy(m.position).add(fwd.clone().multiplyScalar(10)).add(new THREE.Vector3(0, 6, 0))
+    tmp.copy(m.position).addScaledVector(fwd, 22).add(new THREE.Vector3(0, 5, 0))
     camera.lookAt(tmp)
 
     // board the ship
