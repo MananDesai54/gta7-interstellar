@@ -3,6 +3,8 @@ import { world, setAnchor } from './world'
 import { STATIONS } from './constants'
 import { STORY, EPILOGUE } from './story'
 import { newMission } from './missions'
+import { SHOP, PAINTS, maxHpFor, maxBoostFor } from './shop'
+import { loadSave, initPersistence } from './save'
 
 let copId = 0
 
@@ -23,20 +25,58 @@ export const useStore = create((set, get) => ({
   // multiplayer
   pilotName: 'DRIFTER',
   remoteIds: [],
+  leaderboard: [],
+  lastAttackerId: null,
   setRemoteIds: (remoteIds) => set({ remoteIds }),
+  setLeaderboard: (leaderboard) => set({ leaderboard }),
+
+  // garage
+  upgrades: {},
+  paint: '#ff7a00',
+  shopOpen: false,
+  nearStation: false,
+  showLeaderboard: false,
+
+  // races
+  race: { active: false, idx: 0, t0: 0, lastMs: null, bestMs: null },
 
   // story
-  chapter: 0, // index into STORY; STORY.length => free roam
+  chapter: 0,
   stage: 'dialogue', // 'dialogue' | 'active' | 'freeroam'
   lineIdx: 0,
-  dialogue: null, // current lines array being shown
+  dialogue: null,
   copsKilled: 0,
   checkpointIdx: 0,
   carryingCore: false,
 
+  maxHp: () => maxHpFor(get().upgrades),
+  maxBoost: () => maxBoostFor(get().upgrades),
+
   start: (pilotName) => {
-    set({ started: true, pilotName, dialogue: STORY[0].lines, lineIdx: 0, stage: 'dialogue', chapter: 0 })
-    world.markerHidden = true
+    const save = loadSave()
+    const patch = { started: true, pilotName }
+    if (save) {
+      patch.cash = save.cash || 0
+      patch.upgrades = save.upgrades || {}
+      patch.paint = save.paint || '#ff7a00'
+      patch.race = { active: false, idx: 0, t0: 0, lastMs: null, bestMs: save.bestMs ?? null }
+      patch.chapter = Math.min(save.chapter || 0, STORY.length)
+    }
+    patch.hp = maxHpFor(patch.upgrades || {})
+    set(patch)
+    const s = get()
+    if (save?.freeroam) {
+      set({ stage: 'freeroam', dialogue: null })
+      world.markerHidden = false
+      newMission(s.setMission)
+      s.showBanner('SAVE LOADED', '#7ec8ff')
+    } else {
+      const ch = Math.min(s.chapter, STORY.length - 1)
+      set({ chapter: ch, dialogue: STORY[ch].lines, lineIdx: 0, stage: 'dialogue' })
+      world.markerHidden = true
+      if (save) s.showBanner('SAVE LOADED', '#7ec8ff')
+    }
+    initPersistence(useStore)
   },
 
   advanceLine: () => {
@@ -46,9 +86,7 @@ export const useStore = create((set, get) => ({
       set({ lineIdx: s.lineIdx + 1 })
       return
     }
-    // dialogue over
     if (s.chapter >= STORY.length) {
-      // epilogue finished -> free roam with side jobs
       set({ stage: 'freeroam', dialogue: null })
       world.markerHidden = false
       newMission(get().setMission)
@@ -101,15 +139,11 @@ export const useStore = create((set, get) => ({
     const n = s.copsKilled + 1
     set({ copsKilled: n, missionBody: `${obj.text} (${Math.min(n, obj.count)}/${obj.count})` })
     if (n >= obj.count) {
-      if (obj.needCool) {
-        set({ missionBody: 'Now lose the heat — stay clear of patrols until the stars fade.' })
-      } else {
-        get().completeChapter()
-      }
+      if (obj.needCool) set({ missionBody: 'Now lose the heat — stay clear of patrols until the stars fade.' })
+      else get().completeChapter()
     }
   },
 
-  // called by PlayerShip when wanted hits 0 during a needCool objective
   onHeatLost: () => {
     const s = get()
     if (s.stage !== 'active' || s.chapter >= STORY.length) return
@@ -140,6 +174,58 @@ export const useStore = create((set, get) => ({
         set({ chapter: nextCh, stage: 'dialogue', dialogue: EPILOGUE, lineIdx: 0, missionTitle: 'THE DRIFT', missionBody: '' })
       }
     }, 2400)
+  },
+
+  // ---- garage ----
+  setNearStation: (nearStation) => {
+    if (get().nearStation !== nearStation) set({ nearStation })
+  },
+  toggleShop: () => {
+    const s = get()
+    if (!s.shopOpen && !s.nearStation) return
+    set({ shopOpen: !s.shopOpen })
+  },
+  buy: (id) => {
+    const s = get()
+    const item = SHOP.find((i) => i.id === id)
+    if (!item || s.upgrades[id]) return
+    if (item.requires && !s.upgrades[item.requires]) return
+    if (s.cash < item.cost) return
+    set({ cash: s.cash - item.cost, upgrades: { ...s.upgrades, [id]: true } })
+    get().showBanner(item.name + ' INSTALLED', '#6dd96d')
+  },
+  buyPaint: (id) => {
+    const s = get()
+    const p = PAINTS.find((x) => x.id === id)
+    if (!p || s.cash < p.cost) return
+    set({ cash: s.cash - p.cost, paint: p.color })
+  },
+  toggleLeaderboard: () => set((s) => ({ showLeaderboard: !s.showLeaderboard })),
+
+  // ---- races ----
+  startRace: () => {
+    const s = get()
+    if (s.race.active || s.stage === 'dialogue') return
+    set({ race: { ...s.race, active: true, idx: 0, t0: performance.now() } })
+    get().showBanner('RACE — GO GO GO', '#41d6ff')
+  },
+  hitRing: () => {
+    const s = get()
+    set({ race: { ...s.race, idx: s.race.idx + 1 } })
+  },
+  finishRace: (sendRace) => {
+    const s = get()
+    const ms = Math.round(performance.now() - s.race.t0)
+    const bestMs = s.race.bestMs == null ? ms : Math.min(s.race.bestMs, ms)
+    set({ race: { ...s.race, active: false, idx: 0, lastMs: ms, bestMs } })
+    get().showBanner(`FINISH — ${(ms / 1000).toFixed(2)}s${ms <= bestMs ? ' ★ BEST' : ''}`, '#41d6ff')
+    if (sendRace) sendRace(bestMs)
+  },
+  cancelRace: () => {
+    const s = get()
+    if (!s.race.active) return
+    set({ race: { ...s.race, active: false, idx: 0 } })
+    get().showBanner('RACE ABANDONED', '#ff5544')
   },
 
   setMission: (missionTitle, missionBody) => set({ missionTitle, missionBody }),
@@ -173,24 +259,31 @@ export const useStore = create((set, get) => ({
   kill: (reason) => {
     if (get().dead) return
     world.explode(world.playerPos.clone(), '#ff5500')
+    get().cancelRace()
     set({ dead: true, deathReason: reason })
     setTimeout(() => {
       world.cops.clear()
       world.playerVel.set(0, 0, 0)
       world.resetPlayer = true
       const s = get()
-      // dying mid-objective restarts the objective
-      const patch = {
+      // PvP death: killer takes half your roll. Otherwise $200 dry-dock fee.
+      const isPvp = s.lastAttackerId && reason.startsWith('Dusted')
+      const lost = isPvp ? Math.floor(s.cash / 2) : 200
+      if (isPvp && get().reportPvpDeath) get().reportPvpDeath(s.lastAttackerId, lost)
+      set({
         dead: false,
-        hp: 100,
-        boost: 100,
+        hp: get().maxHp(),
+        boost: get().maxBoost(),
         wanted: 0,
         cops: [],
-        cash: Math.max(0, s.cash - 200),
-      }
-      set(patch)
+        cash: Math.max(0, s.cash - lost),
+        lastAttackerId: null,
+      })
       if (s.stage === 'active' && s.chapter < STORY.length) get().beginObjective()
-      else get().setMission('BACK IN ACTION', reason + ' Dry-dock fee: $200.')
+      else get().setMission('BACK IN ACTION', reason + (isPvp ? ` Lost $${lost}.` : ' Dry-dock fee: $200.'))
     }, 3200)
   },
+
+  // injected by net.js to avoid an import cycle
+  reportPvpDeath: null,
 }))

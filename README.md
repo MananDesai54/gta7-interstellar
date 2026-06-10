@@ -39,6 +39,21 @@ Finish the story to unlock endless free-roam side jobs. Dying restarts the activ
 - **Helios** (kill radius) and **Gargantua's event horizon** are lethal; planets bounce you off with hull damage
 - Mission markers anchor to orbiting bodies — your destination moves, lead it
 
+## World extras
+
+- **Asteroid belt** between Mars and Earth orbits — collide and you crater, but heat decays 3× faster inside (police can't track you through the rocks)
+- **Trajectory preview** — cyan line predicts your path through the gravity field, KSP-style. Read it to line up slingshots
+- **Meridian Station** rides Earth orbit — fly close, press **G** to dock at the garage: armor, boost tanks, engine tunes, dual cannons, paint jobs
+- **Saturn Circuit** — fly through the cyan gate near Saturn to start a time trial: 7 rings + return. Best times hit the leaderboard
+- **Smuggler convoys** cross the system every couple of minutes — wipe all three gold haulers for $1,000 (and a 2-star spike)
+- **Bounty PvP** — kill another pilot and you take half their cash
+- **Sound** — engine hum follows the throttle, lasers fall off with distance, and each radio station plays its own procedural loop (R to dial)
+
+## Persistence (no database)
+
+- Your save (cash, story progress, upgrades, paint, best lap) → `localStorage`, restored on reload
+- Shared leaderboard (press **L**) → server memory flushed to `data/leaderboard.json`
+
 ## Controls
 
 | Key | Action |
@@ -50,6 +65,8 @@ Finish the story to unlock endless free-roam side jobs. Dying restarts the activ
 | Shift | boost |
 | Space | lasers |
 | R | radio |
+| G | dock / undock at station |
+| L | leaderboard |
 | Enter | advance dialogue / start |
 
 ## Architecture

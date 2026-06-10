@@ -19,6 +19,11 @@ export const world = {
   cops: new Map(),
   remoteRefs: new Map(), // socket id -> group ref (for PvP hit detection)
 
+  asteroids: [], // {pos: Vector3, r} — filled by AsteroidBelt
+  inBelt: false,
+  stationPos: new THREE.Vector3(), // Earth garage, updated by Station
+  convoy: null, // {groupRef, ships:[{offset, hp, alive}]} — set by Convoy
+
   // mission marker, anchored to an orbiting body when anchor is set
   mission: null,
   missionPhase: 0,
@@ -44,5 +49,6 @@ export function fireLaser(pos, dir, kind) {
     life: 2.2,
     kind,
   })
-  beep(kind === 'friendly' ? 880 : kind === 'remote' ? 700 : 440)
+  const dist = kind === 'friendly' ? 0 : pos.distanceTo(world.playerPos)
+  beep(kind === 'friendly' ? 880 : kind === 'remote' ? 700 : 440, 0.08, 'square', dist)
 }

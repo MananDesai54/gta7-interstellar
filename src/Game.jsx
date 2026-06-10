@@ -8,6 +8,11 @@ import { PhysicsSystem } from './components/PhysicsSystem'
 import { Sun } from './components/Sun'
 import { Planets } from './components/Planets'
 import { BlackHole } from './components/BlackHole'
+import { AsteroidBelt } from './components/AsteroidBelt'
+import { Trajectory } from './components/Trajectory'
+import { Station } from './components/Station'
+import { RaceCourse } from './components/RaceCourse'
+import { Convoy } from './components/Convoy'
 import { PlayerShip } from './components/PlayerShip'
 import { RemotePlayers } from './components/RemotePlayers'
 import { Traffic } from './components/Traffic'
@@ -57,6 +62,11 @@ export default function Game() {
             <Planets />
           </Suspense>
           <BlackHole />
+          <AsteroidBelt />
+          <Trajectory />
+          <Station />
+          <RaceCourse />
+          <Convoy />
           <PlayerShip />
           <RemotePlayers />
           <Traffic />

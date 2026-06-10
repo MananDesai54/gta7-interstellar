@@ -167,3 +167,58 @@ body { font-family: var(--hud-font); }
 .d-who { font-family: var(--display); font-size: 19px; color: var(--gold); letter-spacing: 1px; }
 .d-line { margin-top: 4px; font-size: 15px; line-height: 1.45; color: #e8edf5; }
 .d-next { align-self: flex-end; font-size: 11px; letter-spacing: 3px; color: var(--cyan); animation: blink 1.2s infinite; }
+
+/* ---------- station / dock ---------- */
+.station-tag { font-family: 'Chakra Petch', monospace; font-size: 14px; font-weight: 700; letter-spacing: 3px; color: #41d6ff; text-shadow: 0 0 8px rgba(0,0,0,.9); white-space: nowrap; }
+.dock-prompt { position: fixed; bottom: 24vh; width: 100%; text-align: center; font-size: 16px; letter-spacing: 4px; color: #41d6ff; text-shadow: 2px 2px 0 #000; animation: blink 1.4s infinite; }
+.belt-hint { position: fixed; top: 25%; width: 100%; text-align: center; font-size: 13px; letter-spacing: 4px; color: #9aa3b5; text-shadow: 1px 1px 0 #000; }
+
+/* ---------- race ---------- */
+.race-timer { position: fixed; top: 9%; width: 100%; text-align: center; font-family: var(--display); font-size: 46px; color: #41d6ff; text-shadow: 3px 3px 0 #000; }
+.race-timer span { font-family: var(--hud-font); font-size: 14px; letter-spacing: 4px; color: #9aa3b5; }
+.best-time { margin-top: 6px; font-size: 11px; letter-spacing: 2px; color: #41d6ff; text-shadow: 1px 1px 0 #000; }
+
+/* ---------- garage shop ---------- */
+.shop {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 560px; padding: 26px 30px; pointer-events: auto;
+  background: linear-gradient(180deg, rgba(4,8,18,.96), rgba(2,3,10,.98));
+  border: 1px solid rgba(245,200,67,.45); border-top: 4px solid var(--gold);
+  box-shadow: 0 20px 70px rgba(0,0,0,.85);
+  animation: dlg-in .3s cubic-bezier(.2,1.2,.4,1) both;
+}
+.shop-title { font-family: var(--display); font-size: 32px; color: var(--gold); }
+.shop-cash { position: absolute; top: 28px; right: 30px; font-family: var(--display); font-size: 24px; color: var(--cash); }
+.shop-items { margin-top: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.shop-item {
+  display: flex; flex-direction: column; gap: 3px; padding: 11px 14px; text-align: left;
+  background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.18); cursor: pointer;
+  font-family: var(--hud-font); color: #e8edf5;
+}
+.shop-item:hover:not(:disabled) { border-color: var(--gold); background: rgba(245,200,67,.08); }
+.shop-item.owned { border-color: rgba(95,217,109,.5); opacity: .65; cursor: default; }
+.shop-item.locked { opacity: .35; cursor: not-allowed; }
+.si-name { font-weight: 700; font-size: 13px; letter-spacing: 1px; color: var(--gold); }
+.shop-item.owned .si-name { color: var(--cash); }
+.si-desc { font-size: 11px; color: #9aa3b5; }
+.si-cost { font-size: 12px; font-weight: 700; color: #fff; }
+.shop-paints { margin-top: 16px; display: flex; gap: 10px; }
+.paint { width: 34px; height: 34px; border-radius: 50%; border: 2px solid rgba(255,255,255,.25); cursor: pointer; }
+.paint.active { border-color: #fff; box-shadow: 0 0 14px rgba(255,255,255,.4); }
+.shop-hint { margin-top: 16px; font-size: 11px; letter-spacing: 3px; color: #9aa3b5; text-align: center; }
+
+/* ---------- leaderboard ---------- */
+.leaderboard {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 460px; padding: 24px 28px;
+  background: linear-gradient(180deg, rgba(4,8,18,.95), rgba(2,3,10,.97));
+  border: 1px solid rgba(65,214,255,.4); border-top: 4px solid #41d6ff;
+  box-shadow: 0 20px 70px rgba(0,0,0,.85);
+  animation: dlg-in .3s cubic-bezier(.2,1.2,.4,1) both;
+}
+.lb-title { font-family: var(--display); font-size: 26px; color: #41d6ff; margin-bottom: 14px; }
+.lb-row { display: flex; gap: 12px; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,.08); font-size: 14px; color: #e8edf5; }
+.lb-rank { width: 22px; color: var(--gold); font-weight: 700; }
+.lb-name { flex: 1; letter-spacing: 1px; }
+.lb-cash { color: var(--cash); font-weight: 700; }
+.lb-race { width: 70px; text-align: right; color: #41d6ff; }

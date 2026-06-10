@@ -47,8 +47,18 @@ export function connect(name) {
     fireLaser(new THREE.Vector3(...pos), new THREE.Vector3(...dir), 'remote')
   })
 
-  socket.on('damaged', ({ from, dmg }) => {
+  socket.on('damaged', ({ from, fromId, dmg }) => {
+    useStore.setState({ lastAttackerId: fromId })
     useStore.getState().damage(dmg, `Dusted by ${from}.`)
+  })
+
+  socket.on('bounty', ({ amount, victim }) => {
+    useStore.getState().addCash(amount)
+    useStore.getState().showBanner(`BOUNTY — $${amount} OFF ${victim}`, '#6dd96d')
+  })
+
+  socket.on('leaderboard', (board) => {
+    useStore.getState().setLeaderboard(board)
   })
 
   socket.on('player-left', ({ id }) => {
@@ -59,6 +69,25 @@ export function connect(name) {
 
   socket.on('disconnect', () => {
     net.connected = false
+  })
+
+  // PvP death payout — injected into the store to avoid an import cycle
+  useStore.setState({
+    reportPvpDeath: (target, amount) => {
+      if (net.connected) socket.emit('pvp-death', { to: target, amount })
+    },
+  })
+
+  // report score to the shared leaderboard whenever cash settles
+  let scoreTimer
+  let lastSent = -1
+  useStore.subscribe((s) => {
+    if (!net.connected || s.cash === lastSent) return
+    clearTimeout(scoreTimer)
+    scoreTimer = setTimeout(() => {
+      lastSent = s.cash
+      socket.emit('score', { cash: s.cash })
+    }, 1500)
   })
 }
 
@@ -77,6 +106,10 @@ export function sendFire(pos, dir) {
 
 export function sendPvpHit(target) {
   if (net.connected) net.socket.emit('pvp-hit', { target })
+}
+
+export function sendRace(ms) {
+  if (net.connected) net.socket.emit('race', { ms })
 }
 
 export function simNow() {

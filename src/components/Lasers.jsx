@@ -65,6 +65,25 @@ export function Lasers() {
             }
           }
         }
+        // smuggler convoy haulers
+        if (world.convoy?.groupRef.current) {
+          const g = world.convoy.groupRef.current
+          for (const sh of world.convoy.ships) {
+            if (!sh.alive) continue
+            tmp.copy(sh.offset)
+            g.localToWorld(tmp)
+            if (L.pos.distanceTo(tmp) < 22) {
+              sh.hp -= 15
+              hit = true
+              if (sh.hp <= 0) {
+                sh.alive = false
+                if (sh.ref) sh.ref.visible = false
+                world.explode(tmp.clone(), '#f5c843')
+                s.addCash(100)
+              }
+            }
+          }
+        }
         // PvP: my laser clipping another pilot — tell the server, they take it
         for (const [id, rref] of world.remoteRefs) {
           if (!rref.current || !rref.current.visible) continue
