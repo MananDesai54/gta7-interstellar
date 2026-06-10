@@ -91,6 +91,7 @@ function Astronaut() {
       beep(330, 0.08, 'triangle')
     }
     vel.y -= cfg.gravity * dt
+    if (world.storm > 0.05 && world.stormWind) vel.addScaledVector(world.stormWind, 22 * world.storm * dt)
 
     m.position.addScaledVector(vel, dt)
     if (m.position.y < cfg.y + 10) {

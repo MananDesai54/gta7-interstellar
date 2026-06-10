@@ -28,6 +28,7 @@ import { MissionMarker } from './components/MissionMarker'
 import { Surface } from './components/Surface'
 import { Character } from './components/Character'
 import { Events } from './components/Events'
+import { Weather } from './components/Weather'
 import { Hud } from './components/Hud'
 import { TitleScreen } from './components/TitleScreen'
 import { useStore } from './game/store'
@@ -72,6 +73,7 @@ export default function Game() {
           <Stars radius={16000} depth={30000} count={9000} factor={180} saturation={0} fade speed={0.4} />
           <PhysicsSystem />
           <Events />
+          <Weather />
           <Nebula />
           <Sun />
           <Suspense fallback={null}>

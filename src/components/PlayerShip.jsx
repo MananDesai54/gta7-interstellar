@@ -303,6 +303,7 @@ export function PlayerShip() {
     if (onSurface) {
       // ---------- SURFACE MODE ----------
       world.playerVel.y -= cfg.gravity * dt
+      if (world.storm > 0.05 && world.stormWind) world.playerVel.addScaledVector(world.stormWind, 55 * world.storm * dt)
       world.gravWarn = false
       world.inBelt = false
       ship.position.addScaledVector(world.playerVel, dt)
