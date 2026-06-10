@@ -67,9 +67,40 @@ export const STORY = [
     objective: { type: 'destroyCops', count: 5, wanted: 4, needCool: true, text: 'Destroy 5 patrol ships, then lose the heat' },
     pay: 2500,
   },
+  {
+    id: 6,
+    title: 'WELCOME TO NEO VEGA',
+    lines: [
+      ['DJ QUASAR', '🎧', "Heat's off. Time you saw the only city the Marshals never tamed — Neo Vega. Neon, noodles, no questions."],
+      ['DJ QUASAR', '🎧', 'Dock at the landing pad. Tip: hold X for overdrive when the lanes are clear. The void is big.'],
+    ],
+    objective: { type: 'goto', anchorStatic: [4300, 70, -2840], text: 'Dock at the Neo Vega landing pad' },
+    pay: 800,
+  },
+  {
+    id: 7,
+    title: 'ROCK HUSTLE',
+    lines: [
+      ['MAMA NOODLE', '🍜', "New face. Vega runs on ore, kid. Gold-glow rocks in the belt — crack them, catch what spills."],
+      ['DJ QUASAR', '🎧', "She's good for it. Bring back 5 ore chunks. Watch the belt though — Red Varga's crew shoots first."],
+    ],
+    objective: { type: 'collectOre', count: 5, anchorStatic: [-1700, 0, -1750], text: 'Mine 5 ore chunks from glowing belt rocks' },
+    pay: 1200,
+  },
+  {
+    id: 8,
+    title: 'KING OF THE BELT',
+    lines: [
+      ['DJ QUASAR', '🎧', "Red Varga heard you were poaching his rocks. He's put a price on your hull."],
+      ['RED VARGA', '☠️', 'This belt feeds MY crew, drifter. Come collect your funeral.'],
+      ['DJ QUASAR', '🎧', "His hideout's a hollowed rock in the belt. Big ship, big ego, big explosion. End him."],
+    ],
+    objective: { type: 'destroyBoss', anchorStatic: [-1790, 0, -1680], text: 'Destroy RED VARGA at the pirate hideout' },
+    pay: 4000,
+  },
 ]
 
 export const EPILOGUE = [
-  ['DJ QUASAR', '🎧', "Okoye's filing paperwork from a rescue pod. The Sagittarius System knows your name now."],
-  ['DJ QUASAR', '🎧', 'The drift is yours, pilot. Freelance jobs on the gold marker whenever you want them.'],
+  ['DJ QUASAR', '🎧', "Okoye's filing paperwork, Varga's stardust, and Neo Vega's buying you drinks. The system knows your name."],
+  ['DJ QUASAR', '🎧', 'The drift is yours, pilot. Freelance jobs on the gold marker, ore in the belt, races at Saturn. Go be a legend.'],
 ]

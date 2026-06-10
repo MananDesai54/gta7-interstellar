@@ -9,6 +9,12 @@ export function loadSave() {
   }
 }
 
+export function wipeSave() {
+  try {
+    localStorage.removeItem(KEY)
+  } catch {}
+}
+
 export function initPersistence(useStore) {
   let t
   useStore.subscribe((s) => {
@@ -26,6 +32,8 @@ export function initPersistence(useStore) {
             upgrades: s.upgrades,
             paint: s.paint,
             bestMs: s.race.bestMs,
+            ore: s.ore,
+            discoveries: s.discoveries,
           }),
         )
       } catch {}

@@ -18,6 +18,8 @@ export const PAINTS = [
   { id: 'gold', color: '#f5c843', cost: 500 },
 ]
 
+export const ORE_PRICE = 90
+
 export function maxHpFor(upgrades) {
   return 100 + (upgrades.armor1 ? 50 : 0) + (upgrades.armor2 ? 100 : 0)
 }

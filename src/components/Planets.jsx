@@ -10,6 +10,7 @@ const T = {
   earthNormal: 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_normal_2048.jpg',
   earthSpec: 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_specular_2048.jpg',
   clouds: 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_clouds_1024.png',
+  moon: 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/moon_1024.jpg',
   saturn: 'https://raw.githubusercontent.com/jeromeetienne/threex.planets/master/images/saturnmap.jpg',
   ringColor: 'https://raw.githubusercontent.com/jeromeetienne/threex.planets/master/images/saturnringcolor.jpg',
   ringAlpha: 'https://raw.githubusercontent.com/jeromeetienne/threex.planets/master/images/saturnringpattern.gif',
@@ -88,6 +89,18 @@ function Saturn() {
   )
 }
 
+function Luna() {
+  const map = useTexture(T.moon)
+  const group = useRef()
+  useOrbit('luna', group)
+  return (
+    <mesh ref={group}>
+      <sphereGeometry args={[BODIES.luna.radius, 32, 24]} />
+      <meshStandardMaterial map={map} roughness={1} />
+    </mesh>
+  )
+}
+
 function Mars() {
   const map = useTexture(T.mars)
   const group = useRef()
@@ -133,6 +146,7 @@ export function Planets() {
   return (
     <>
       <Earth />
+      <Luna />
       <Saturn />
       <Mars />
       <OrbitLines />

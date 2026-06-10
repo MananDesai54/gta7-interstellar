@@ -222,3 +222,66 @@ body { font-family: var(--hud-font); }
 .lb-name { flex: 1; letter-spacing: 1px; }
 .lb-cash { color: var(--cash); font-weight: 700; }
 .lb-race { width: 70px; text-align: right; color: #41d6ff; }
+
+/* ---------- waypoint ---------- */
+.waypoint { position: fixed; transform: translate(-50%, -50%); pointer-events: none; z-index: 45; text-align: center; }
+.wp-diamond {
+  width: 16px; height: 16px; margin: 0 auto; transform: rotate(45deg);
+  border: 2.5px solid #ffd24a; box-shadow: 0 0 12px rgba(255, 210, 74, 0.7), inset 0 0 6px rgba(255, 210, 74, 0.4);
+}
+.waypoint.edge .wp-diamond {
+  width: 0; height: 0; border: none; box-shadow: none;
+  border-left: 9px solid transparent; border-right: 9px solid transparent; border-bottom: 16px solid #ffd24a;
+  filter: drop-shadow(0 0 8px rgba(255, 210, 74, 0.8));
+}
+.wp-dist { margin-top: 5px; font-size: 12px; font-weight: 700; letter-spacing: 1px; color: #ffd24a; text-shadow: 1px 1px 0 #000; }
+
+/* ---------- damage flash ---------- */
+.dmg-flash { position: fixed; inset: 0; pointer-events: none; opacity: 0; transition: opacity 0.25s; z-index: 44;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(200, 20, 20, 0.45) 100%); }
+.dmg-flash.on { opacity: 1; transition: opacity 0.05s; }
+
+/* ---------- overdrive ---------- */
+.overdrive { position: fixed; bottom: 86px; right: 290px; font-size: 15px; font-weight: 700; letter-spacing: 5px;
+  color: #ff2bd6; text-shadow: 0 0 14px rgba(255, 43, 214, 0.7), 1px 1px 0 #000; animation: blink 0.5s infinite; }
+
+.ore-count { margin-top: 6px; font-size: 14px; font-weight: 700; letter-spacing: 2px; color: #ffd24a; text-shadow: 1px 1px 0 #000; }
+
+/* ---------- pause ---------- */
+.pause {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 420px; padding: 30px 34px; pointer-events: auto; text-align: center;
+  background: linear-gradient(180deg, rgba(4, 8, 18, 0.97), rgba(2, 3, 10, 0.98));
+  border: 1px solid rgba(255, 255, 255, 0.25); border-top: 4px solid #fff;
+  box-shadow: 0 20px 70px rgba(0, 0, 0, 0.9);
+}
+.pause-title { font-family: var(--display); font-size: 42px; color: #fff; }
+.pause-btn {
+  display: block; width: 100%; margin-top: 16px; padding: 12px;
+  background: rgba(245, 200, 67, 0.12); border: 1px solid var(--gold); color: var(--gold);
+  font-family: var(--hud-font); font-weight: 700; font-size: 15px; letter-spacing: 4px; cursor: pointer;
+}
+.pause-btn:hover { background: rgba(245, 200, 67, 0.25); }
+.pause-btn.danger { border-color: #b33; color: #e55; background: rgba(180, 40, 40, 0.1); }
+.pause-btn.danger:hover { background: rgba(180, 40, 40, 0.25); }
+.pause-controls { margin-top: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 7px 18px; text-align: left; font-size: 12px; color: #9aa3b5; }
+.pause-controls b { color: #e8edf5; margin-right: 6px; }
+
+/* ---------- galaxy log ---------- */
+.logbook {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 520px; padding: 24px 28px; pointer-events: auto;
+  background: linear-gradient(180deg, rgba(4, 8, 18, 0.96), rgba(2, 3, 10, 0.98));
+  border: 1px solid rgba(65, 214, 255, 0.4); border-top: 4px solid #41d6ff;
+  box-shadow: 0 20px 70px rgba(0, 0, 0, 0.85);
+}
+.log-row { display: flex; justify-content: space-between; gap: 14px; padding: 8px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.08); font-size: 13px; }
+.log-row .log-name { color: #5c6678; letter-spacing: 2px; font-weight: 700; }
+.log-row.found .log-name { color: #41d6ff; }
+.log-row .log-hint { color: #8b93a5; font-style: italic; text-align: right; }
+.log-row.found .log-hint { color: var(--cash); font-style: normal; }
+
+/* ---------- title save row ---------- */
+.t-save { margin-top: 14px; font-size: 12px; letter-spacing: 2px; color: var(--cash); animation: fade-in 0.8s 0.9s both; }
+.t-wipe { margin-left: 14px; padding: 4px 10px; background: none; border: 1px solid #b33; color: #e55;
+  font-family: var(--hud-font); font-size: 11px; letter-spacing: 2px; cursor: pointer; pointer-events: auto; }

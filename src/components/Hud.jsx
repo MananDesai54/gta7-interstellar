@@ -2,39 +2,50 @@ import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { useStore } from '../game/store'
 import { world } from '../game/world'
-import { STATIONS } from '../game/constants'
+import { STATIONS, CITY_POS, HIDEOUT_POS } from '../game/constants'
 import { MAP_R } from '../game/physics'
-import { SHOP, PAINTS, maxHpFor } from '../game/shop'
+import { SHOP, PAINTS, maxHpFor, ORE_PRICE } from '../game/shop'
+import { DISCOVERIES } from '../game/discoveries'
 import { beep, startRadio } from '../game/audio'
 
 const fwdTmp = new THREE.Vector3()
 const cvTmp = new THREE.Vector3()
+const projTmp = new THREE.Vector3()
 
 function fmtMs(ms) {
   return ms == null ? '—' : (ms / 1000).toFixed(2) + 's'
 }
+function fmtDist(d) {
+  return d > 1000 ? (d / 1000).toFixed(1) + 'K' : Math.round(d)
+}
 
 export function Hud() {
   const {
-    started, dead, deathReason, hp, boost, cash, wanted,
+    started, dead, deathReason, hp, boost, cash, wanted, ore,
     missionTitle, missionBody, banner, station, dialogue, lineIdx,
-    shopOpen, nearStation, race, upgrades, paint,
+    shopOpen, nearStation, race, upgrades, paint, paused, showLog, discoveries,
   } = useStore()
   const nextStation = useStore((s) => s.nextStation)
   const buy = useStore((s) => s.buy)
   const buyPaint = useStore((s) => s.buyPaint)
+  const sellOre = useStore((s) => s.sellOre)
+  const newGame = useStore((s) => s.newGame)
+  const togglePause = useStore((s) => s.togglePause)
   const canvas = useRef()
+  const wayRef = useRef()
   const [speed, setSpeed] = useState(0)
   const [gravWarn, setGravWarn] = useState(false)
   const [inBelt, setInBelt] = useState(false)
+  const [warpOn, setWarpOn] = useState(false)
+  const [flash, setFlash] = useState(false)
   const [raceMs, setRaceMs] = useState(0)
 
-  // keys: radio, dialogue advance, dock
+  // keys
   useEffect(() => {
     const onKey = (e) => {
       const s = useStore.getState()
       if (!s.started) return
-      if (e.code === 'KeyR') {
+      if (e.code === 'KeyR' && !s.paused) {
         nextStation()
         beep(660, 0.1, 'sine')
       }
@@ -42,8 +53,14 @@ export function Hud() {
         beep(520, 0.06, 'sine')
         s.advanceLine()
       }
-      if (e.code === 'KeyG') s.toggleShop()
-      if (e.code === 'Escape' && s.shopOpen) s.toggleShop()
+      if (e.code === 'KeyG' && !s.paused) s.toggleShop()
+      if (e.code === 'KeyJ' && !s.paused) s.toggleLog()
+      if (e.code === 'Escape') {
+        if (s.shopOpen) s.toggleShop()
+        else if (s.showLog) s.toggleLog()
+        else if (!document.pointerLockElement) s.togglePause()
+      }
+      if (e.code === 'KeyP') s.togglePause()
     }
     addEventListener('keydown', onKey)
     return () => removeEventListener('keydown', onKey)
@@ -54,12 +71,56 @@ export function Hud() {
     if (started) startRadio(station)
   }, [started, station])
 
-  // minimap + speedo + race timer poll
+  // fast loop: waypoint projection (smooth) — direct DOM writes, no re-render
+  useEffect(() => {
+    let raf
+    const tick = () => {
+      raf = requestAnimationFrame(tick)
+      const el = wayRef.current
+      if (!el) return
+      const s = useStore.getState()
+      const cam = world.camera
+      if (!s.started || s.dead || s.paused || world.markerHidden || !cam || s.stage === 'dialogue') {
+        el.style.display = 'none'
+        return
+      }
+      projTmp.copy(world.missionPos).project(cam)
+      const behind = projTmp.z > 1
+      let x = projTmp.x
+      let y = projTmp.y
+      if (behind) {
+        x = -x
+        y = -y
+      }
+      const off = behind || Math.abs(x) > 0.92 || Math.abs(y) > 0.88
+      if (off) {
+        // clamp to screen edge, point arrow outward
+        const ang = Math.atan2(y, x)
+        x = Math.cos(ang) * 0.92
+        y = Math.sin(ang) * 0.88
+        el.className = 'waypoint edge'
+        el.firstChild.style.transform = `rotate(${-ang + Math.PI / 2}rad)`
+      } else {
+        el.className = 'waypoint'
+        el.firstChild.style.transform = 'rotate(45deg)'
+      }
+      el.style.display = 'block'
+      el.style.left = `${((x + 1) / 2) * 100}%`
+      el.style.top = `${((1 - y) / 2) * 100}%`
+      el.lastChild.textContent = fmtDist(world.playerPos.distanceTo(world.missionPos))
+    }
+    tick()
+    return () => cancelAnimationFrame(raf)
+  }, [])
+
+  // slow loop: minimap + readouts
   useEffect(() => {
     const iv = setInterval(() => {
       setSpeed(Math.round(world.playerVel.length()))
       setGravWarn(world.gravWarn)
       setInBelt(world.inBelt)
+      setWarpOn(world.warp > 0.5)
+      setFlash(performance.now() - world.flashT < 220)
       const r = useStore.getState().race
       if (r.active) setRaceMs(performance.now() - r.t0)
       const ctx = canvas.current?.getContext('2d')
@@ -87,13 +148,18 @@ export function Hud() {
       }
       dot(world.bodyPos.helios, '#ffe9a8', 10)
       dot(world.bodyPos.earth, '#3fa9f5', 6)
+      dot(world.bodyPos.luna, '#999', 2.5)
       dot(world.bodyPos.saturn, '#d6b27a', 8)
       dot(world.bodyPos.mars, '#c1542f', 4)
       dot(world.bodyPos.gargantua, '#ff8800', 6)
+      dot(world.bodyPos.comet, '#aaddff', 3)
+      dot(CITY_POS, '#ff2bd6', 5)
+      dot(HIDEOUT_POS, '#ff4433', 3.5)
       dot(world.stationPos, '#41d6ff', 3)
       if (!world.markerHidden) dot(world.missionPos, '#ffd24a', 4)
       world.npcs.forEach((n) => n?.data.alive && n.ref.current && dot(n.ref.current.position, '#bbb', 2))
       world.cops.forEach((c) => c.alive && c.ref.current && dot(c.ref.current.position, '#f33', 2.5))
+      world.pirates.forEach((p) => p?.data.alive && p.ref.current && dot(p.ref.current.position, '#ff4433', 2.5))
       if (world.convoy?.groupRef.current) {
         world.convoy.ships.forEach((sh) => {
           if (!sh.alive) return
@@ -120,6 +186,13 @@ export function Hud() {
 
   return (
     <div className="hud">
+      <div className={`dmg-flash ${flash ? 'on' : ''}`} />
+
+      <div className="waypoint" ref={wayRef} style={{ display: 'none' }}>
+        <div className="wp-diamond" />
+        <div className="wp-dist" />
+      </div>
+
       <div className="mission">
         <div className="m-title">{missionTitle}</div>
         <div className="m-body">{missionBody}</div>
@@ -132,6 +205,7 @@ export function Hud() {
             <span key={i} className={i < wanted ? 'lit' : 'dim'}>★</span>
           ))}
         </div>
+        {ore > 0 && <div className="ore-count">⬢ ORE ×{ore}</div>}
         {race.bestMs != null && <div className="best-time">SATURN CIRCUIT BEST {fmtMs(race.bestMs)}</div>}
       </div>
 
@@ -143,6 +217,7 @@ export function Hud() {
       </div>
 
       <div className="speedo">{speed}<span> km/s</span></div>
+      {warpOn && <div className="overdrive">▸▸ OVERDRIVE ◂◂</div>}
       <canvas ref={canvas} className="minimap" width={190} height={190} />
       <div className="radio">{STATIONS[station]}</div>
       {banner && <div className="banner" style={{ color: banner.color }}>{banner.text}</div>}
@@ -152,11 +227,11 @@ export function Hud() {
 
       {race.active && <div className="race-timer">{fmtMs(raceMs)} <span>RING {Math.min(race.idx + 1, 8)}/8</span></div>}
 
-      {nearStation && !shopOpen && !dead && <div className="dock-prompt">⬡ MERIDIAN STATION — PRESS G TO DOCK</div>}
+      {nearStation && !shopOpen && !dead && <div className="dock-prompt">⬡ DOCK AVAILABLE — PRESS G</div>}
 
       {shopOpen && (
         <div className="shop">
-          <div className="shop-title">MERIDIAN GARAGE</div>
+          <div className="shop-title">GARAGE &amp; TRADE</div>
           <div className="shop-cash">${cash.toLocaleString()}</div>
           <div className="shop-items">
             {SHOP.map((item) => {
@@ -176,6 +251,11 @@ export function Hud() {
                 </button>
               )
             })}
+            <button className={`shop-item ${ore <= 0 ? 'locked' : ''}`} onClick={sellOre} disabled={ore <= 0}>
+              <span className="si-name">SELL ORE ×{ore}</span>
+              <span className="si-desc">${ORE_PRICE} per chunk</span>
+              <span className="si-cost">{ore > 0 ? `+$${ore * ORE_PRICE}` : 'EMPTY HOLD'}</span>
+            </button>
           </div>
           <div className="shop-paints">
             {PAINTS.map((p) => (
@@ -189,6 +269,40 @@ export function Hud() {
             ))}
           </div>
           <div className="shop-hint">G / ESC to undock</div>
+        </div>
+      )}
+
+      {showLog && (
+        <div className="logbook">
+          <div className="lb-title">GALAXY LOG — {discoveries.length}/{DISCOVERIES.length} FOUND</div>
+          {DISCOVERIES.map((d) => {
+            const found = discoveries.includes(d.id)
+            return (
+              <div key={d.id} className={`log-row ${found ? 'found' : ''}`}>
+                <span className="log-name">{found ? d.name : '???'}</span>
+                <span className="log-hint">{found ? `+$${d.bonus}` : d.hint}</span>
+              </div>
+            )
+          })}
+          <div className="shop-hint">J to close</div>
+        </div>
+      )}
+
+      {paused && (
+        <div className="pause">
+          <div className="pause-title">PAUSED</div>
+          <button className="pause-btn" onClick={togglePause}>RESUME</button>
+          <div className="pause-controls">
+            <div><b>CLICK</b> mouse flight</div>
+            <div><b>W/S</b> thrust</div>
+            <div><b>SHIFT</b> boost</div>
+            <div><b>X</b> overdrive</div>
+            <div><b>SPACE</b> lasers</div>
+            <div><b>G</b> dock</div>
+            <div><b>J</b> galaxy log</div>
+            <div><b>R</b> radio</div>
+          </div>
+          <button className="pause-btn danger" onClick={newGame}>NEW GAME (WIPE SAVE)</button>
         </div>
       )}
 

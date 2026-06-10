@@ -22,6 +22,7 @@ function Cop({ id }) {
     if (!m || !entry || !entry.alive) return
     const t = state.clock.elapsedTime
     const s = useStore.getState()
+    if (s.paused) return
 
     if (!entry.init) {
       entry.init = true

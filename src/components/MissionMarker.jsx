@@ -14,13 +14,13 @@ export function MissionMarker() {
   })
   return (
     <group ref={ref}>
-      <mesh>
+      <mesh renderOrder={999}>
         <torusGeometry args={[40, 4, 12, 48]} />
-        <meshBasicMaterial color="#ffd24a" toneMapped={false} />
+        <meshBasicMaterial color="#ffd24a" toneMapped={false} depthTest={false} transparent opacity={0.9} />
       </mesh>
-      <mesh rotation-x={Math.PI / 2}>
+      <mesh rotation-x={Math.PI / 2} renderOrder={999}>
         <torusGeometry args={[40, 2.5, 10, 48]} />
-        <meshBasicMaterial color="#ffe9a8" toneMapped={false} transparent opacity={0.7} />
+        <meshBasicMaterial color="#ffe9a8" toneMapped={false} transparent opacity={0.7} depthTest={false} />
       </mesh>
       <pointLight color="#ffd24a" intensity={40} distance={400} decay={1.6} />
     </group>

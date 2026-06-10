@@ -18,10 +18,20 @@ export const world = {
   npcs: [],
   cops: new Map(),
 
-  asteroids: [], // {pos: Vector3, r} — filled by AsteroidBelt
+  asteroids: [], // {pos: Vector3, r, ore?} — filled by AsteroidBelt
   inBelt: false,
   stationPos: new THREE.Vector3(), // Earth garage, updated by Station
   convoy: null, // {groupRef, ships:[{offset, hp, alive}]} — set by Convoy
+
+  buildings: [], // city AABBs {min, max} — filled by City
+  pirates: [], // {ref, data:{hp, alive, boss, ...}} — filled by Pirates
+  pickups: [], // {pos, value, type:'cash'|'ore', live} — floating loot
+  camera: null, // live three camera, for HUD screen projection
+  mouse: { dx: 0, dy: 0 },
+  shake: 0, // camera shake amount, decays in PlayerShip
+  flashT: 0, // last damage timestamp (performance.now), HUD reads
+  warp: 0, // 0..1 overdrive amount, HUD reads
+  invulnUntil: 0, // respawn grace period (performance.now)
 
   // mission marker, anchored to an orbiting body when anchor is set
   mission: null,
@@ -38,7 +48,28 @@ export function setAnchor(anchor) {
     world.missionAnchor = null
     return
   }
+  if (anchor.static) {
+    world.missionAnchor = null
+    world.missionPos.set(...anchor.static)
+    return
+  }
   world.missionAnchor = { body: anchor.body, offset: new THREE.Vector3(...anchor.offset) }
+}
+
+const PICKUP_POOL = 48
+export function spawnPickup(pos, value, type = 'cash') {
+  let slot = world.pickups.find((p) => !p.live)
+  if (!slot) {
+    if (world.pickups.length >= PICKUP_POOL) slot = world.pickups[0]
+    else {
+      slot = { pos: new THREE.Vector3(), value: 0, type: 'cash', live: false }
+      world.pickups.push(slot)
+    }
+  }
+  slot.pos.copy(pos).add(new THREE.Vector3((Math.random() - 0.5) * 50, (Math.random() - 0.5) * 30, (Math.random() - 0.5) * 50))
+  slot.value = value
+  slot.type = type
+  slot.live = true
 }
 
 export function fireLaser(pos, dir, kind) {

@@ -1,10 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useStore } from '../game/store'
 import { initAudio, beep } from '../game/audio'
+import { loadSave, wipeSave } from '../game/save'
 
 export function TitleScreen() {
   const started = useStore((s) => s.started)
-  const [name, setName] = useState('')
+  const save = useMemo(() => (typeof window !== 'undefined' ? loadSave() : null), [])
+  const [name, setName] = useState(save?.name || '')
 
   useEffect(() => {
     const onKey = (e) => {
@@ -40,15 +42,29 @@ export function TitleScreen() {
           onChange={(e) => setName(e.target.value)}
           autoFocus
         />
+        {save && (
+          <div className="t-save">
+            SAVE FOUND — {save.name} · ${(save.cash || 0).toLocaleString()} · CH{Math.min((save.chapter || 0) + 1, 9)}
+            <button
+              className="t-wipe"
+              onClick={() => {
+                wipeSave()
+                location.reload()
+              }}
+            >
+              NEW GAME
+            </button>
+          </div>
+        )}
         <div className="t-controls">
+          <div><b>CLICK</b><span>mouse flight</span></div>
           <div><b>W / S</b><span>thrust / brake</span></div>
-          <div><b>A / D</b><span>yaw</span></div>
-          <div><b>↑ / ↓</b><span>pitch</span></div>
-          <div><b>Q / E</b><span>roll</span></div>
           <div><b>SHIFT</b><span>boost</span></div>
+          <div><b>X</b><span>overdrive</span></div>
           <div><b>SPACE</b><span>lasers</span></div>
+          <div><b>G</b><span>dock</span></div>
+          <div><b>J</b><span>galaxy log</span></div>
           <div><b>R</b><span>radio</span></div>
-          <div><b>ENTER</b><span>talk / start</span></div>
         </div>
         <div className="t-press" onClick={launch}>— PRESS ENTER TO FLY —</div>
       </div>

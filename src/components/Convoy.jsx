@@ -29,6 +29,7 @@ export function Convoy() {
 
   useFrame((state, dt) => {
     const s = useStore.getState()
+    if (s.paused) return
     const t = state.clock.elapsedTime
     const g = group.current
 

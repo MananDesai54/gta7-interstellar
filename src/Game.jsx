@@ -13,6 +13,10 @@ import { Trajectory } from './components/Trajectory'
 import { Station } from './components/Station'
 import { RaceCourse } from './components/RaceCourse'
 import { Convoy } from './components/Convoy'
+import { City } from './components/City'
+import { Pirates } from './components/Pirates'
+import { Pickups } from './components/Pickups'
+import { Discoveries } from './components/Discoveries'
 import { PlayerShip } from './components/PlayerShip'
 import { Traffic } from './components/Traffic'
 import { Police } from './components/Police'
@@ -35,6 +39,7 @@ const KEYMAP = [
   { name: 'rollR', keys: ['KeyE'] },
   { name: 'boost', keys: ['ShiftLeft', 'ShiftRight'] },
   { name: 'fire', keys: ['Space'] },
+  { name: 'warp', keys: ['KeyX'] },
 ]
 
 export default function Game() {
@@ -64,6 +69,10 @@ export default function Game() {
           <AsteroidBelt />
           <Trajectory />
           <Station />
+          <City />
+          <Pirates />
+          <Pickups />
+          <Discoveries />
           <RaceCourse />
           <Convoy />
           <PlayerShip />

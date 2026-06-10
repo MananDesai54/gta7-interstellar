@@ -3,6 +3,7 @@ import * as THREE from 'three'
 import { useFrame } from '@react-three/fiber'
 import { Ship } from './Ship'
 import { world } from '../game/world'
+import { useStore } from '../game/store'
 import { randPos } from '../game/constants'
 
 const COLORS = ['#4f9fe8', '#7fd97f', '#e88fb8', '#c8c8d0', '#9a7fe8']
@@ -33,6 +34,7 @@ function Npc({ index }) {
   useFrame((state, dt) => {
     const m = ref.current
     if (!m) return
+    if (useStore.getState().paused) return
     const t = state.clock.elapsedTime
     if (!data.alive) {
       if (t > data.hideUntil) {

@@ -1,18 +1,17 @@
-import { useMemo, useRef } from 'react'
+import { useRef } from 'react'
 import * as THREE from 'three'
 import { useFrame } from '@react-three/fiber'
 import { Html } from '@react-three/drei'
 import { world } from '../game/world'
-import { useStore } from '../game/store'
 
 const OFFSET = new THREE.Vector3(540, 160, 540)
 export const DOCK_RANGE = 340
 
 // Meridian Station — the garage. Rides along in Earth orbit; fly within
-// range and press G to dock.
+// range and press G to dock. (Dock detection lives in PlayerShip, which
+// also covers the Neo Vega pad.)
 export function Station() {
   const ref = useRef()
-  const tmp = useMemo(() => new THREE.Vector3(), [])
 
   useFrame((state, dt) => {
     const m = ref.current
@@ -20,10 +19,6 @@ export function Station() {
     m.position.copy(world.bodyPos.earth).add(OFFSET)
     world.stationPos.copy(m.position)
     m.rotation.y += dt * 0.25
-    const s = useStore.getState()
-    if (s.started && !s.dead) {
-      s.setNearStation(tmp.copy(world.playerPos).distanceTo(m.position) < DOCK_RANGE)
-    }
   })
 
   return (

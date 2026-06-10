@@ -2,8 +2,8 @@
 
 Open-world space crime in the Sagittarius System. Next.js + React Three Fiber. Single-player, deploys anywhere Next.js runs — including Vercel.
 
+![city](shots/city.png)
 ![title](shots/title.png)
-![dialogue](shots/dialogue.png)
 
 ## Run
 
@@ -16,15 +16,39 @@ Deploy: standard Next.js app — `vercel`, or `npm run build && npm start`.
 
 ## Story mode — THE DRIFT
 
-Five chapters with dialogue (advance with **ENTER**):
+Eight chapters with dialogue (advance with **ENTER**):
 
 1. **FRESH OFF THE FREIGHTER** — prove you can fly, tag a cache in Earth orbit
 2. **RING RUNNER** — thread three drop buoys around a moving Saturn
 3. **BADGE OF DISHONOR** — Marshal Okoye wants a tax; pay in scrap metal
 4. **THE DERELICT** — pull a data core out of Gargantua's gravity well, then escape it
 5. **SLINGSHOT** — five patrols, full heat, then vanish
+6. **WELCOME TO NEO VEGA** — find the neon city and dock
+7. **ROCK HUSTLE** — mine 5 ore chunks from the belt's glowing rocks
+8. **KING OF THE BELT** — kill RED VARGA at the pirate hideout
 
 Finish the story to unlock endless free-roam side jobs. Dying restarts the active objective and costs a $200 dry-dock fee.
+
+## Neo Vega City
+
+A neon free-station floating between Earth's orbit and the black hole: ~35 lit towers to fly between (they hurt), holographic billboards, shuttle traffic looping the canyons, and a landing pad that doubles as a garage + ore market. Cops will chase you straight into the streets.
+
+## Flight feel
+
+- **Click** the screen for pointer-lock mouse flight (keyboard A/D + arrows still work)
+- **X** = overdrive: ~6× thrust for crossing the system, auto-cuts near gravity wells, heat, or the belt
+- KSP-style trajectory line, screen-edge waypoint arrow with distance, damage flash + camera shake, 3s respawn protection
+- **ESC/P** pause menu, **J** galaxy log
+
+## Exploration — Galaxy Log (J)
+
+7 discoveries pay cash bonuses the first time you find them: Neo Vega, Luna, a comet on a long ellipse, a derelict science vessel in Gargantua's well, a monolith (1:4:9), the pirate hideout, and a sun-grazing dare. Hints are in the log.
+
+## Economy
+
+- **Mining**: shoot the gold-glowing belt rocks, scoop the ore chunks, sell at any dock ($90/ea)
+- **Pirates** guard the belt: $150 + credit chips per kill, no police heat
+- **Convoys**, **side jobs**, **Saturn Circuit** time trials, cop bounties — all still pay
 
 ## Physics
 

@@ -3,8 +3,9 @@ import { world, setAnchor } from './world'
 import { STATIONS } from './constants'
 import { STORY, EPILOGUE } from './story'
 import { newMission } from './missions'
-import { SHOP, PAINTS, maxHpFor, maxBoostFor } from './shop'
-import { loadSave, initPersistence } from './save'
+import { SHOP, PAINTS, maxHpFor, maxBoostFor, ORE_PRICE } from './shop'
+import { loadSave, initPersistence, wipeSave } from './save'
+import { DISCOVERIES } from './discoveries'
 
 let copId = 0
 
@@ -23,6 +24,10 @@ export const useStore = create((set, get) => ({
   cops: [],
 
   pilotName: 'DRIFTER',
+  paused: false,
+  showLog: false,
+  ore: 0,
+  discoveries: [],
 
   // garage
   upgrades: {},
@@ -54,6 +59,8 @@ export const useStore = create((set, get) => ({
       patch.paint = save.paint || '#ff7a00'
       patch.race = { active: false, idx: 0, t0: 0, lastMs: null, bestMs: save.bestMs ?? null }
       patch.chapter = Math.min(save.chapter || 0, STORY.length)
+      patch.ore = save.ore || 0
+      patch.discoveries = save.discoveries || []
     }
     patch.hp = maxHpFor(patch.upgrades || {})
     set(patch)
@@ -102,13 +109,62 @@ export const useStore = create((set, get) => ({
       missionBody: obj.text,
     })
     world.markerHidden = false
-    if (obj.type === 'goto' || obj.type === 'corewell') setAnchor(obj.anchor)
+    if (obj.anchorStatic) setAnchor({ static: obj.anchorStatic })
+    else if (obj.type === 'goto' || obj.type === 'corewell') setAnchor(obj.anchor)
     else if (obj.type === 'checkpoints') setAnchor(obj.anchors[0])
-    else if (obj.type === 'destroyCops') {
+    if (obj.type === 'destroyCops') {
       world.markerHidden = true
       setAnchor(null)
       get().setWanted(obj.wanted || 2)
     }
+  },
+
+  // ---- exploration / mining / pirates ----
+  discover: (id) => {
+    const s = get()
+    if (s.discoveries.includes(id)) return
+    const d = DISCOVERIES.find((x) => x.id === id)
+    if (!d) return
+    set({ discoveries: [...s.discoveries, id], cash: s.cash + d.bonus })
+    get().showBanner(`DISCOVERED: ${d.name} +$${d.bonus}`, '#41d6ff')
+  },
+  toggleLog: () => set((s) => ({ showLog: !s.showLog })),
+
+  collectOre: () => {
+    const s = get()
+    set({ ore: s.ore + 1 })
+    if (s.stage === 'active' && s.chapter < STORY.length) {
+      const obj = STORY[s.chapter].objective
+      if (obj.type === 'collectOre') {
+        const have = s.ore + 1
+        set({ missionBody: `${obj.text} (${Math.min(have, obj.count)}/${obj.count})` })
+        if (have >= obj.count) get().completeChapter()
+      }
+    }
+  },
+  sellOre: () => {
+    const s = get()
+    if (s.ore <= 0) return
+    const total = s.ore * ORE_PRICE
+    set({ ore: 0, cash: s.cash + total })
+    get().showBanner(`ORE SOLD — $${total}`, '#6dd96d')
+  },
+
+  onBossKilled: () => {
+    const s = get()
+    if (s.stage === 'active' && s.chapter < STORY.length && STORY[s.chapter].objective.type === 'destroyBoss') {
+      get().completeChapter()
+    }
+  },
+
+  togglePause: () => {
+    const s = get()
+    if (!s.started || s.shopOpen || s.stage === 'dialogue') return
+    set({ paused: !s.paused })
+  },
+  newGame: () => {
+    wipeSave()
+    location.reload()
   },
 
   onCheckpoint: () => {
@@ -242,7 +298,10 @@ export const useStore = create((set, get) => ({
 
   damage: (n, reason) => {
     const s = get()
-    if (s.dead || !s.started) return
+    if (s.dead || !s.started || s.paused) return
+    if (performance.now() < world.invulnUntil) return // respawn grace
+    world.flashT = performance.now()
+    world.shake = Math.min(1, world.shake + 0.45)
     const hp = s.hp - n
     set({ hp })
     if (hp <= 0) get().kill(reason)
@@ -257,6 +316,7 @@ export const useStore = create((set, get) => ({
       world.cops.clear()
       world.playerVel.set(0, 0, 0)
       world.resetPlayer = true
+      world.invulnUntil = performance.now() + 3000
       const s = get()
       set({
         dead: false,
