@@ -50,13 +50,18 @@ export function beep(freq, dur = 0.08, type = 'square', dist = 0) {
 }
 
 // ---- procedural radio ----
-// each station: pentatonic-ish loop with its own wave/tempo/register
+// each station: melody + bass line with its own wave/tempo/register
 const TUNES = [
-  { wave: 'sine', bpm: 60, base: 220, steps: [0, 3, 7, 10, 7, 3], sustain: 0.9 }, // Gargantua FM — slow drones
-  { wave: 'square', bpm: 132, base: 330, steps: [0, 7, 12, 7, 3, 10, 7, 5], sustain: 0.18 }, // Ring Road — drift hits
-  { wave: 'triangle', bpm: 88, base: 262, steps: [0, 4, 7, 12, 7, 4], sustain: 0.4 }, // Blue Marble — anthems
-  { wave: 'sawtooth', bpm: 96, base: 110, steps: [0, 0, 12, 0, 10, 0, 7, 5], sustain: 0.12 }, // K-SLIP — bass rap
-  { wave: 'sine', bpm: 70, base: 392, steps: [0, 2, 5, 9, 5, 2], sustain: 0.6 }, // Helios Heat
+  { wave: 'sine', bpm: 60, base: 220, steps: [0, 3, 7, 10, 7, 3], sustain: 0.9,
+    bass: { wave: 'sine', steps: [-12, -5], sustain: 1.6 } }, // Gargantua FM — slow drones
+  { wave: 'square', bpm: 132, base: 330, steps: [0, 7, 12, 7, 3, 10, 7, 5], sustain: 0.18,
+    bass: { wave: 'triangle', steps: [-24, -24, -17, -12], sustain: 0.4 } }, // Ring Road — drift hits
+  { wave: 'triangle', bpm: 88, base: 262, steps: [0, 4, 7, 12, 7, 4], sustain: 0.4,
+    bass: { wave: 'sine', steps: [-12, -8, -5, -8], sustain: 0.8 } }, // Blue Marble — anthems
+  { wave: 'sawtooth', bpm: 96, base: 110, steps: [0, 0, 12, 0, 10, 0, 7, 5], sustain: 0.12,
+    bass: { wave: 'sine', steps: [-12, -12, -10, -7], sustain: 0.3 } }, // K-SLIP — bass rap
+  { wave: 'sine', bpm: 70, base: 392, steps: [0, 2, 5, 9, 5, 2], sustain: 0.6,
+    bass: { wave: 'triangle', steps: [-19, -12], sustain: 1.2 } }, // Helios Heat
   null, // Static FM — noise
 ]
 
@@ -80,20 +85,26 @@ export function startRadio(stationIdx) {
   let step = 0
   const beat = 60 / tune.bpm
   let nextAt = actx.currentTime + 0.1
+  const note = (semis, when, dur, wave, vol) => {
+    const o = actx.createOscillator()
+    const g = actx.createGain()
+    o.type = wave
+    o.frequency.value = tune.base * Math.pow(2, semis / 12)
+    g.gain.setValueAtTime(vol, when)
+    g.gain.exponentialRampToValueAtTime(0.0003, when + dur)
+    o.connect(g)
+    g.connect(actx.destination)
+    o.start(when)
+    o.stop(when + dur + 0.05)
+  }
   const iv = setInterval(() => {
     while (nextAt < actx.currentTime + 0.4) {
-      const semis = tune.steps[step % tune.steps.length]
-      const freq = tune.base * Math.pow(2, semis / 12)
-      const o = actx.createOscillator()
-      const g = actx.createGain()
-      o.type = tune.wave
-      o.frequency.value = freq
-      g.gain.setValueAtTime(0.018, nextAt)
-      g.gain.exponentialRampToValueAtTime(0.0003, nextAt + beat * tune.sustain)
-      o.connect(g)
-      g.connect(actx.destination)
-      o.start(nextAt)
-      o.stop(nextAt + beat * tune.sustain + 0.05)
+      note(tune.steps[step % tune.steps.length], nextAt, beat * tune.sustain, tune.wave, 0.016)
+      // bass voice on every other beat
+      if (tune.bass && step % 2 === 0) {
+        const b = tune.bass
+        note(b.steps[(step / 2) % b.steps.length], nextAt, beat * b.sustain, b.wave, 0.022)
+      }
       nextAt += beat
       step++
     }

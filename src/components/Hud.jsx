@@ -257,7 +257,7 @@ export function Hud() {
       <div className="speedo">{speed}<span> km/s</span></div>
       {warpOn && <div className="overdrive">▸▸ OVERDRIVE ◂◂</div>}
       <canvas ref={canvas} className="minimap" width={190} height={190} />
-      <div className="radio">{STATIONS[station]}</div>
+      <div className="radio" key={station}>{STATIONS[station]}</div>
       {banner && <div className="banner" style={{ color: banner.color }}>{banner.text}</div>}
       {chapterCard && (
         <div className="chapter-card">
