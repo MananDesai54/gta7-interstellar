@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
 import { useFrame, useThree } from '@react-three/fiber'
-import { useKeyboardControls } from '@react-three/drei'
+import { useKeyboardControls, Trail } from '@react-three/drei'
 import { Ship } from './Ship'
 import { world, fireLaser } from '../game/world'
 import { useStore } from '../game/store'
@@ -311,5 +311,17 @@ export function PlayerShip() {
     world.playerQuat.copy(ship.quaternion)
   })
 
-  return <Ship ref={ref} body="#15151a" accent={paint} position={[0, 0, 600]} />
+  return (
+    <Ship ref={ref} body="#15151a" accent={paint} position={[0, 0, 600]}>
+      {/* engine trails ride the nacelle exhausts */}
+      {[-4.6, 4.6].map((x) => (
+        <Trail key={x} width={5} length={7} color="#41d6ff" attenuation={(t) => t * t} decay={1.5}>
+          <mesh position={[x, -0.4, 11]}>
+            <sphereGeometry args={[0.1, 4, 4]} />
+            <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+          </mesh>
+        </Trail>
+      ))}
+    </Ship>
+  )
 }

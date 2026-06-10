@@ -5,6 +5,7 @@ import { Canvas } from '@react-three/fiber'
 import { KeyboardControls, Stars } from '@react-three/drei'
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing'
 import { PhysicsSystem } from './components/PhysicsSystem'
+import { Nebula } from './components/Nebula'
 import { Sun } from './components/Sun'
 import { Planets } from './components/Planets'
 import { BlackHole } from './components/BlackHole'
@@ -61,6 +62,7 @@ export default function Game() {
           <ambientLight intensity={0.35} color="#46566e" />
           <Stars radius={16000} depth={30000} count={9000} factor={180} saturation={0} fade speed={0.4} />
           <PhysicsSystem />
+          <Nebula />
           <Sun />
           <Suspense fallback={null}>
             <Planets />
