@@ -314,6 +314,12 @@ export function PlayerShip() {
         world.playerVel.y = Math.max(0, world.playerVel.y * -0.25)
         world.playerVel.x *= 0.85
         world.playerVel.z *= 0.85
+        if (impact > 35) {
+          // touchdown: kick up local dust, thump, little shake
+          world.explode(ship.position.clone().setY(groundY - 4), cfg.dust)
+          world.shake = Math.min(1, world.shake + impact / 400)
+          beep(70, 0.15, 'sine')
+        }
         if (impact > 130) {
           beep(95, 0.2, 'sawtooth')
           s.damage(10, `Pancaked on ${cfg.name}.`)

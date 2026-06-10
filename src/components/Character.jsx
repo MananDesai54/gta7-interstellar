@@ -94,6 +94,11 @@ function Astronaut() {
 
     m.position.addScaledVector(vel, dt)
     if (m.position.y < cfg.y + 10) {
+      if (vel.y < -25) {
+        // landing puff after a big hop
+        world.explode(m.position.clone().setY(cfg.y + 6), cfg.dust)
+        beep(120, 0.06, 'sine')
+      }
       m.position.y = cfg.y + 10
       vel.y = 0
     }

@@ -14,6 +14,7 @@ export const SURFACES = {
     ground: '#0e3a52', // ocean
     gravity: 70,
     drag: 0.55,
+    dust: '#c9b98a',
     sun: '#fff4da',
     ambient: 1.1,
   },
@@ -26,6 +27,7 @@ export const SURFACES = {
     ground: '#7e3b22',
     gravity: 27,
     drag: 0.16,
+    dust: '#b06038',
     sun: '#ffd9b8',
     ambient: 0.8,
   },
@@ -38,6 +40,7 @@ export const SURFACES = {
     ground: '#54575e',
     gravity: 12,
     drag: 0.04,
+    dust: '#8a8d94',
     sun: '#ffffff',
     ambient: 0.5,
   },
