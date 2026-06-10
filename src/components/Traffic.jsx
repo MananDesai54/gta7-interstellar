@@ -1,12 +1,11 @@
 import { useEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
 import { useFrame } from '@react-three/fiber'
-import { Ship } from './Ship'
+import { Model, CRAFTS } from './Model'
 import { world } from '../game/world'
 import { useStore } from '../game/store'
 import { randPos } from '../game/constants'
 
-const COLORS = ['#4f9fe8', '#7fd97f', '#e88fb8', '#c8c8d0', '#9a7fe8']
 const NPC_COUNT = 14
 
 function Npc({ index }) {
@@ -53,7 +52,11 @@ function Npc({ index }) {
     }
   })
 
-  return <Ship ref={ref} body="#23232b" accent={COLORS[index % COLORS.length]} position={data.spawn} scale={0.9} />
+  return (
+    <group ref={ref} position={data.spawn}>
+      <Model url={CRAFTS[index % CRAFTS.length]} scale={11} rotation-y={Math.PI} />
+    </group>
+  )
 }
 
 export function Traffic() {

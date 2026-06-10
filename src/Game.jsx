@@ -71,24 +71,24 @@ export default function Game() {
           <Sun />
           <Suspense fallback={null}>
             <Planets />
+            <BlackHole />
+            <AsteroidBelt />
+            <Trajectory />
+            <Station />
+            <City />
+            <Pirates />
+            <Pickups />
+            <Discoveries />
+            <RaceCourse />
+            <Convoy />
+            <Surface />
+            <PlayerShip />
+            <Traffic />
+            <Police />
+            <Lasers />
+            <Explosions />
+            <MissionMarker />
           </Suspense>
-          <BlackHole />
-          <AsteroidBelt />
-          <Trajectory />
-          <Station />
-          <City />
-          <Pirates />
-          <Pickups />
-          <Discoveries />
-          <RaceCourse />
-          <Convoy />
-          <Surface />
-          <PlayerShip />
-          <Traffic />
-          <Police />
-          <Lasers />
-          <Explosions />
-          <MissionMarker />
           <EffectComposer>
             <Bloom intensity={1.15} luminanceThreshold={0.22} mipmapBlur radius={0.72} />
             <Vignette eskil={false} offset={0.18} darkness={0.82} />

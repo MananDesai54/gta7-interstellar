@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { useFrame } from '@react-three/fiber'
-import { Ship } from './Ship'
+import { Model } from './Model'
 import { world } from '../game/world'
 import { useStore } from '../game/store'
 import { WORLD_R } from '../game/constants'
@@ -83,7 +83,8 @@ export function Convoy() {
     <group ref={group} visible={false} key={run}>
       {data.ships.map((sh, i) => (
         <group key={i} position={sh.offset} ref={(el) => (sh.ref = el)}>
-          <Ship body="#3a2f1a" accent="#f5c843" engine="#ffae00" scale={1.15} />
+          <Model url={i === 0 ? '/models/craft_miner.glb' : i === 1 ? '/models/craft_cargoA.glb' : '/models/craft_cargoB.glb'} scale={14} rotation-y={Math.PI} />
+          <pointLight color="#f5c843" intensity={25} distance={120} decay={1.6} position={[0, 8, 0]} />
         </group>
       ))}
     </group>

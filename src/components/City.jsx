@@ -3,6 +3,7 @@ import * as THREE from 'three'
 import { useFrame } from '@react-three/fiber'
 import { world } from '../game/world'
 import { CITY_POS, CITY_PAD } from '../game/constants'
+import { Model } from './Model'
 
 // ---- procedural textures (client-only) ----
 function windowTexture() {
@@ -190,6 +191,8 @@ export function City() {
           <meshBasicMaterial color="#ffd24a" toneMapped={false} transparent opacity={0.9} side={THREE.DoubleSide} />
         </mesh>
         <pointLight color="#ffd24a" intensity={60} distance={400} decay={1.6} position={[0, 40, 0]} />
+        <Model url="/models/turret_double.glb" scale={14} position={[85, 2, 0]} rotation-y={-0.6} />
+        <Model url="/models/turret_double.glb" scale={14} position={[-85, 2, 30]} rotation-y={2.2} />
       </group>
       {/* city glow */}
       <pointLight position={[CITY_POS.x, CITY_POS.y + 260, CITY_POS.z]} color="#ff2bd6" intensity={160} distance={1600} decay={1.7} />

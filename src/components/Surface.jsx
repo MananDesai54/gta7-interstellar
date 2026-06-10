@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import * as THREE from 'three'
 import { useStore } from '../game/store'
 import { SURFACES, surfaceProps } from '../game/surfaces'
+import { Model } from './Model'
 
 // The active planet surface. Mounted only while landed — a ground disc,
 // a sky dome with fog, per-planet props, and its own lighting.
@@ -97,8 +98,11 @@ function MarsGulch({ props }) {
               <meshBasicMaterial color="#ff7a22" toneMapped={false} />
             </mesh>
             <pointLight position={[0, 130, 0]} color="#ff7a22" intensity={40} distance={400} decay={1.7} />
+            <Model url="/models/monorail_trainCargo.glb" scale={18} position={[60, 0, 30]} rotation-y={i} />
           </group>
         ))}
+      {/* launch site */}
+      <Model url="/models/rocket_baseA.glb" scale={30} position={[180, 0, -240]} />
     </>
   )
 }
@@ -118,20 +122,11 @@ function LunaFlats({ props }) {
         .filter((p) => p.kind === 'dome')
         .map((p, i) => (
           <group key={`dome${i}`} position={[p.x, 0, p.z]}>
-            <mesh position={[0, 0, 0]}>
-              <sphereGeometry args={[55, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2]} />
-              <meshStandardMaterial color="#c8ccd4" roughness={0.4} metalness={0.3} />
-            </mesh>
-            <mesh position={[0, 70, 0]}>
-              <cylinderGeometry args={[1.5, 1.5, 60, 6]} />
-              <meshStandardMaterial color="#888" metalness={0.7} />
-            </mesh>
-            <mesh position={[18, 22, 42]}>
-              <sphereGeometry args={[4, 8, 6]} />
-              <meshBasicMaterial color="#ffd24a" toneMapped={false} />
-            </mesh>
+            <Model url="/models/hangar_roundGlass.glb" scale={45} rotation-y={i * 2} />
+            <pointLight position={[0, 40, 0]} color="#ffd24a" intensity={30} distance={300} decay={1.7} />
           </group>
         ))}
+      <Model url="/models/satelliteDish_detailed.glb" scale={35} position={[150, 0, 480]} rotation-y={2.4} />
     </>
   )
 }
