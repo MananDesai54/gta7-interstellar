@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
 import { useFrame, useThree } from '@react-three/fiber'
-import { useKeyboardControls } from '@react-three/drei'
-import { Model } from './Model'
+import { useKeyboardControls, useGLTF, useAnimations } from '@react-three/drei'
 import { world, fireLaser } from '../game/world'
 import { useStore } from '../game/store'
 import { beep, setEngine } from '../game/audio'
 import { SURFACES } from '../game/surfaces'
+
+useGLTF.preload('/models/robot.glb')
 
 const WALK = 42
 const RUN = 85
@@ -31,6 +32,18 @@ function Astronaut() {
   const boardHeld = useRef(true) // F still held from exiting — wait for release
   const fireCd = useRef(0)
   const bob = useRef(0)
+
+  // animated robot pilot: crossfade between baked clips per action
+  const { scene, animations } = useGLTF('/models/robot.glb')
+  const { actions } = useAnimations(animations, ref)
+  const anim = useRef('')
+  const playAnim = (name, fade = 0.2) => {
+    if (anim.current === name || !actions[name]) return
+    const prev = actions[anim.current]
+    if (prev) prev.fadeOut(fade)
+    actions[name].reset().fadeIn(fade).play()
+    anim.current = name
+  }
 
   // sidearm: click while pointer-locked
   useEffect(() => {
@@ -111,9 +124,10 @@ function Astronaut() {
       m.position.z *= f
     }
 
-    // walk bob
-    bob.current += dt * (Math.abs(move) > 0 ? (k.boost ? 14 : 9) : 0)
-    m.children[0] && (m.children[0].position.y = grounded && move ? Math.abs(Math.sin(bob.current)) * 0.7 : 0)
+    // drive the animation state machine
+    if (!grounded) playAnim('Jump', 0.12)
+    else if (move) playAnim(k.boost ? 'Running' : 'Walking')
+    else playAnim('Idle', 0.3)
 
     // GTA-style third person: pulled back, raised, slight right-shoulder
     // offset — the astronaut stays fully in frame lower-center
@@ -147,7 +161,7 @@ function Astronaut() {
 
   return (
     <group ref={ref}>
-      <Model url="/models/astronautA.glb" scale={9} rotation-y={Math.PI} />
+      <primitive object={scene} scale={1.7} rotation-y={Math.PI} />
     </group>
   )
 }
