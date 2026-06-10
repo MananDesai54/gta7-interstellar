@@ -4,8 +4,7 @@ import { useFrame } from '@react-three/fiber'
 import { useStore } from '../game/store'
 import { world, fireLaser } from '../game/world'
 import { SURFACES, surfaceProps } from '../game/surfaces'
-import { Model } from './Model'
-import { windowTexture } from './City'
+import { Model, CITY_BUILDINGS } from './Model'
 
 // The active planet surface. Mounted only while landed — a ground disc,
 // a sky dome with fog, per-planet props, and its own lighting.
@@ -125,8 +124,30 @@ function Turrets({ cfg }) {
 const tmp2g = new THREE.Vector3()
 
 function EarthIsland({ props }) {
-  const buildings = props.filter((p) => p.kind === 'building')
-  const winTex = useMemo(() => windowTexture(), [])
+  // proper Kenney City Kit buildings on a downtown grid — skyscrapers in
+  // the core, low-rise out toward the beach
+  const blocks = useMemo(() => {
+    const out = []
+    const lot = 230
+    for (let gx = -3; gx <= 3; gx++) {
+      for (let gz = -3; gz <= 3; gz++) {
+        const ring = Math.max(Math.abs(gx), Math.abs(gz))
+        if (gx === 0 && gz === 0) continue // beacon plaza
+        if (Math.hypot(gx, gz) > 3.2) continue
+        const sky = ring <= 1
+        const pool = sky ? CITY_BUILDINGS.slice(8) : CITY_BUILDINGS.slice(0, 8)
+        const idx = Math.abs(gx * 7 + gz * 13) % pool.length
+        out.push({
+          url: pool[idx],
+          x: gx * lot + ((gx * 31) % 23),
+          z: gz * lot + ((gz * 17) % 23),
+          rot: (Math.abs(gx + gz) % 4) * (Math.PI / 2),
+          scale: sky ? 34 : 26,
+        })
+      }
+    }
+    return out
+  }, [])
   return (
     <>
       {/* sand island under the city */}
@@ -134,11 +155,13 @@ function EarthIsland({ props }) {
         <circleGeometry args={[1600, 48]} />
         <meshStandardMaterial color="#d8c690" roughness={1} />
       </mesh>
-      {buildings.map((b, i) => (
-        <mesh key={i} position={[b.x, b.h / 2 + 2, b.z]}>
-          <boxGeometry args={[b.w, b.h, b.d2]} />
-          <meshStandardMaterial color={b.c} roughness={0.85} emissive="#ffd9a0" emissiveMap={winTex} emissiveIntensity={0.55} />
-        </mesh>
+      {/* downtown asphalt */}
+      <mesh rotation-x={-Math.PI / 2} position={[0, 1.6, 0]}>
+        <circleGeometry args={[900, 48]} />
+        <meshStandardMaterial color="#3a3f48" roughness={0.95} />
+      </mesh>
+      {blocks.map((b, i) => (
+        <Model key={i} url={b.url} scale={b.scale} position={[b.x, 2, b.z]} rotation-y={b.rot} />
       ))}
       {/* breakers ring — reads as surf line */}
       <mesh rotation-x={-Math.PI / 2} position={[0, 1.5, 0]}>

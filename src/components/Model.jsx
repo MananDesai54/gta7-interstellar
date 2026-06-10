@@ -24,3 +24,20 @@ useGLTF.preload('/models/turret_double.glb')
 useGLTF.preload('/models/rocket_baseA.glb')
 useGLTF.preload('/models/monorail_trainCargo.glb')
 useGLTF.preload('/models/astronautA.glb')
+
+export const CITY_BUILDINGS = [
+  '/models/building-a.glb',
+  '/models/building-b.glb',
+  '/models/building-c.glb',
+  '/models/building-d.glb',
+  '/models/building-e.glb',
+  '/models/building-f.glb',
+  '/models/building-g.glb',
+  '/models/building-h.glb',
+  '/models/building-skyscraper-a.glb',
+  '/models/building-skyscraper-b.glb',
+  '/models/building-skyscraper-c.glb',
+  '/models/building-skyscraper-d.glb',
+  '/models/building-skyscraper-e.glb',
+]
+CITY_BUILDINGS.forEach((u) => useGLTF.preload(u))
