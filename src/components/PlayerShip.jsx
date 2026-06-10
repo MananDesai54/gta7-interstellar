@@ -295,7 +295,10 @@ export function PlayerShip() {
     world.playerVel.addScaledVector(fwd, thrust * dt)
     // drag only bites while steering — a coasting ship keeps its orbit
     const steering = thrust !== 0 || k.left || k.right || k.pitchUp || k.pitchDown
-    world.playerVel.multiplyScalar(1 - ((steering ? 0.35 : onSurface ? 0.25 : 0.03) + world.warp * 0.5) * dt)
+    // in space: steering drag vs near-zero coast. On a surface: the
+    // atmosphere decides — Earth's air brakes hard, Luna's vacuum doesn't.
+    const drag = onSurface ? Math.max(cfg.drag, steering ? 0.3 : 0) : steering ? 0.35 : 0.03
+    world.playerVel.multiplyScalar(1 - (drag + world.warp * 0.5) * dt)
 
     if (onSurface) {
       // ---------- SURFACE MODE ----------

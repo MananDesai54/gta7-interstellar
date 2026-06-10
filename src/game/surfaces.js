@@ -1,6 +1,9 @@
 // Landable planet surfaces. Each lives at its own deep-Y offset in scene
 // space so the solar system stays where it is. Gravity is per-world;
 // climb past `ceiling` to return to orbit.
+// Gravity uses real ratios (Earth 1g reference → Mars 0.38g, Luna 0.17g);
+// drag models the atmosphere: thick on Earth, thin on Mars, vacuum on Luna —
+// flying low over Tranquility Flats is gloriously slippery.
 export const SURFACES = {
   earth: {
     name: 'BAHÍA LIBRE',
@@ -10,6 +13,7 @@ export const SURFACES = {
     fogFar: 5200,
     ground: '#0e3a52', // ocean
     gravity: 70,
+    drag: 0.55,
     sun: '#fff4da',
     ambient: 1.1,
   },
@@ -20,7 +24,8 @@ export const SURFACES = {
     fog: '#b05a32',
     fogFar: 4200,
     ground: '#7e3b22',
-    gravity: 45,
+    gravity: 27,
+    drag: 0.16,
     sun: '#ffd9b8',
     ambient: 0.8,
   },
@@ -31,7 +36,8 @@ export const SURFACES = {
     fog: '#05060a',
     fogFar: 9000,
     ground: '#54575e',
-    gravity: 16,
+    gravity: 12,
+    drag: 0.04,
     sun: '#ffffff',
     ambient: 0.5,
   },
