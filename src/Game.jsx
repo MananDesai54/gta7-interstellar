@@ -25,6 +25,7 @@ import { Lasers } from './components/Lasers'
 import { Explosions } from './components/Explosions'
 import { MissionMarker } from './components/MissionMarker'
 import { Surface } from './components/Surface'
+import { Character } from './components/Character'
 import { Events } from './components/Events'
 import { Hud } from './components/Hud'
 import { TitleScreen } from './components/TitleScreen'
@@ -45,6 +46,7 @@ const KEYMAP = [
   { name: 'fire', keys: ['Space'] },
   { name: 'warp', keys: ['KeyX'] },
   { name: 'land', keys: ['KeyL'] },
+  { name: 'exit', keys: ['KeyF'] },
 ]
 
 export default function Game() {
@@ -84,6 +86,7 @@ export default function Game() {
             <RaceCourse />
             <Convoy />
             <Surface />
+            <Character />
             <PlayerShip />
             <Traffic />
             <Police />

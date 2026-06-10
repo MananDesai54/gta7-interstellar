@@ -25,7 +25,7 @@ export function Hud() {
     started, dead, deathReason, hp, boost, cash, wanted, ore,
     missionTitle, missionBody, banner, station, dialogue, lineIdx,
     shopOpen, nearStation, race, upgrades, paint, paused, showLog, discoveries, chapterCard, busted,
-    surface, landPrompt,
+    surface, landPrompt, onFoot,
   } = useStore()
   const nextStation = useStore((s) => s.nextStation)
   const buy = useStore((s) => s.buy)
@@ -45,6 +45,8 @@ export function Hud() {
   const [raceMs, setRaceMs] = useState(0)
   const [photoMode, setPhotoMode] = useState(false)
   const [fareLeft, setFareLeft] = useState(0)
+  const [canExit, setCanExit] = useState(false)
+  const [boardPrompt, setBoardPrompt] = useState(false)
   const mapZoom = useRef(1) // M cycles 0.45 / 1 / 2.2
 
   // keys
@@ -146,6 +148,8 @@ export function Hud() {
       setFlare(world.flare || 0)
       setFlareWarn(!!world.flareWarn)
       setFareLeft(world.missionDeadline ? Math.max(0, world.missionDeadline - performance.now()) : 0)
+      setCanExit(!!world.canExit)
+      setBoardPrompt(!!world.boardPrompt)
       setWarpOn(world.warp > 0.5)
       setFlash(performance.now() - world.flashT < 220)
       const r = useStore.getState().race
@@ -279,9 +283,12 @@ export function Hud() {
       )}
       {surface && (
         <div className="surface-tag">
-          📍 {SURFACES[surface].name}, {surface.toUpperCase()} — <span>climb or press L to leave</span>
+          📍 {SURFACES[surface].name}, {surface.toUpperCase()} —{' '}
+          <span>{onFoot ? 'on foot · SHIFT run · SPACE jump · click fire' : 'climb or press L to leave'}</span>
         </div>
       )}
+      {surface && !onFoot && canExit && !dead && <div className="dock-prompt land">🧑‍🚀 PRESS F TO STEP OUT</div>}
+      {onFoot && boardPrompt && !dead && <div className="dock-prompt land">🚀 PRESS F TO BOARD SHIP</div>}
 
       {shopOpen && (
         <div className="shop">
@@ -366,6 +373,7 @@ export function Hud() {
             <div><b>X</b> overdrive</div>
             <div><b>SPACE</b> lasers</div>
             <div><b>L</b> land / lift off</div>
+            <div><b>F</b> step out / board</div>
             <div><b>G</b> dock</div>
             <div><b>J</b> galaxy log</div>
             <div><b>H</b> photo mode</div>

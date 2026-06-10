@@ -35,6 +35,9 @@ export const world = {
   surface: null, // mirrors store.surface for the frame loops
   landedBody: null, // which body we landed on, for the return-to-orbit
   turrets: [], // surface defense turrets {ref, data:{hp, alive, ...}}
+  shipPos: new THREE.Vector3(), // parked ship position while on foot
+  canExit: false, // parked + slow on a surface -> F steps out
+  boardPrompt: false, // on foot, near the ship
 
   // mission marker, anchored to an orbiting body when anchor is set
   mission: null,

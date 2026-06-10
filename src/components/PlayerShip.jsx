@@ -64,6 +64,7 @@ export function PlayerShip() {
   const decay = useRef(0)
   const bustT = useRef(0)
   const landHeld = useRef(false)
+  const exitHeld = useRef(false)
   const pauseHeld = useRef(false)
   const boostLocal = useRef(100)
   const spawned = useRef(false)
@@ -160,6 +161,7 @@ export function PlayerShip() {
 
     if (world.resetPlayer) {
       // death on a surface respawns you back in orbit
+      if (s.onFoot) s.setOnFoot(false)
       if (world.surface) {
         world.surface = null
         s.setSurface(null)
@@ -193,6 +195,13 @@ export function PlayerShip() {
       setEngine(0, false)
       world.mouse.dx = world.mouse.dy = 0
       if ((s.paused || s.busted) && document.pointerLockElement) document.exitPointerLock()
+      return
+    }
+
+    // pilot is outside — ship stays parked, Character drives the frame
+    if (s.onFoot) {
+      world.shipPos.copy(ship.position)
+      world.warp = 0
       return
     }
 
@@ -318,6 +327,16 @@ export function PlayerShip() {
         liftOff(ship, s)
         return
       }
+      // parked + slow -> F steps out of the ship
+      world.canExit = world.playerVel.length() < 25 && ship.position.y < cfg.y + 45
+      if (world.canExit && k.exit && !exitHeld.current && !freeze) {
+        exitHeld.current = true
+        world.shipPos.copy(ship.position)
+        s.setOnFoot(true)
+        beep(520, 0.1, 'sine')
+        return
+      }
+      if (!k.exit) exitHeld.current = false
       // surface courier loop
       if (s.stage === 'freeroam' && s.surfaceJob > 0 && ship.position.distanceTo(world.missionPos) < 60) {
         beep(s.surfaceJob === 1 ? 990 : 1320, 0.18, 'sine')

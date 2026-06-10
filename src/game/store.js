@@ -32,6 +32,8 @@ export const useStore = create((set, get) => ({
   surface: null, // 'earth'|'mars'|'luna' while landed
   landPrompt: null, // body name when close enough to land
   surfaceJob: 0, // 0 none, 1 pickup set, 2 delivering
+  onFoot: false, // pilot is outside the ship on a surface
+  setOnFoot: (onFoot) => set({ onFoot }),
   stats: { kills: 0, deaths: 0, earned: 0, busts: 0 },
 
   addKill: () => set((s) => ({ stats: { ...s.stats, kills: s.stats.kills + 1 } })),
