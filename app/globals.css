@@ -294,3 +294,6 @@ body { font-family: var(--hud-font); }
   text-shadow: 3px 3px 0 #000, 0 0 30px rgba(245, 200, 67, 0.35); transform: skewX(-3deg); }
 @keyframes cc-in { from { opacity: 0; transform: translateX(40px); } }
 @keyframes cc-out { to { opacity: 0; } }
+
+/* ---------- busted ---------- */
+.wasted.busted span { color: #3d8bff; text-shadow: 0 0 36px #000, 5px 5px 0 #000; }

@@ -28,6 +28,7 @@ export function PlayerShip() {
   const fireCd = useRef(0)
   const copCd = useRef(0)
   const decay = useRef(0)
+  const bustT = useRef(0)
   const boostLocal = useRef(100)
   const spawned = useRef(false)
   const muzzleFlip = useRef(false)
@@ -92,10 +93,10 @@ export function PlayerShip() {
     }
 
     ship.visible = !s.dead
-    if (s.dead || s.paused) {
+    if (s.dead || s.paused || s.busted) {
       setEngine(0, false)
       world.mouse.dx = world.mouse.dy = 0
-      if (s.paused && document.pointerLockElement) document.exitPointerLock()
+      if ((s.paused || s.busted) && document.pointerLockElement) document.exitPointerLock()
       return
     }
 
@@ -295,6 +296,16 @@ export function PlayerShip() {
       const copClose = [...world.cops.values()].some(
         (c) => c.alive && c.ref.current && c.ref.current.position.distanceTo(ship.position) < 1800,
       )
+      // BUSTED: sit still next to a patrol and they cuff you
+      const copOnTop = [...world.cops.values()].some(
+        (c) => c.alive && c.ref.current && c.ref.current.position.distanceTo(ship.position) < 130,
+      )
+      bustT.current = copOnTop && world.playerVel.length() < 30 ? bustT.current + dt : 0
+      if (bustT.current > 1.6) {
+        bustT.current = 0
+        s.bust()
+        return
+      }
       decay.current = copClose ? 0 : decay.current + dt * (world.inBelt ? 3 : 1)
       if (decay.current > 12) {
         decay.current = 0

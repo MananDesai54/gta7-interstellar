@@ -312,6 +312,21 @@ export const useStore = create((set, get) => ({
     if (hp <= 0) get().kill(reason)
   },
 
+  busted: false,
+  bust: () => {
+    const s = get()
+    if (s.dead || s.busted) return
+    set({ busted: true })
+    world.playerVel.set(0, 0, 0)
+    setTimeout(() => {
+      const fine = Math.min(300, get().cash)
+      world.cops.clear()
+      world.invulnUntil = performance.now() + 3000
+      set((st) => ({ busted: false, wanted: 0, cops: [], cash: Math.max(0, st.cash - fine) }))
+      get().setMission('RELEASED', `The Marshals impounded $${fine} and let you drift. Marker still live.`)
+    }, 3000)
+  },
+
   kill: (reason) => {
     if (get().dead) return
     world.explode(world.playerPos.clone(), '#ff5500')

@@ -23,7 +23,7 @@ export function Hud() {
   const {
     started, dead, deathReason, hp, boost, cash, wanted, ore,
     missionTitle, missionBody, banner, station, dialogue, lineIdx,
-    shopOpen, nearStation, race, upgrades, paint, paused, showLog, discoveries, chapterCard,
+    shopOpen, nearStation, race, upgrades, paint, paused, showLog, discoveries, chapterCard, busted,
   } = useStore()
   const nextStation = useStore((s) => s.nextStation)
   const buy = useStore((s) => s.buy)
@@ -328,6 +328,14 @@ export function Hud() {
           <div className="wasted-bar top" />
           <span>WASTED</span>
           <div className="death-reason">{deathReason}</div>
+          <div className="wasted-bar bottom" />
+        </div>
+      )}
+      {busted && (
+        <div className="wasted busted">
+          <div className="wasted-bar top" />
+          <span>BUSTED</span>
+          <div className="death-reason">Loitered into a Marshal patrol. Fine + impound.</div>
           <div className="wasted-bar bottom" />
         </div>
       )}
