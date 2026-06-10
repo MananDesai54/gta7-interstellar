@@ -35,6 +35,7 @@ export function initPersistence(useStore) {
             ore: s.ore,
             discoveries: s.discoveries,
             stats: s.stats,
+            prestige: s.prestige,
           }),
         )
       } catch {}

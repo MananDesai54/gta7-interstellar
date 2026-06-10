@@ -35,8 +35,27 @@ export const useStore = create((set, get) => ({
   onFoot: false, // pilot is outside the ship on a surface
   setOnFoot: (onFoot) => set({ onFoot }),
   stats: { kills: 0, deaths: 0, earned: 0, busts: 0 },
+  prestige: 0,
 
   addKill: () => set((s) => ({ stats: { ...s.stats, kills: s.stats.kills + 1 } })),
+
+  // NG+: story resets, everything you own comes with you, story pay +50%/run
+  doPrestige: () => {
+    const s = get()
+    if (s.chapter < STORY.length) return
+    set({
+      prestige: s.prestige + 1,
+      chapter: 0,
+      stage: 'dialogue',
+      dialogue: STORY[0].lines,
+      lineIdx: 0,
+      paused: false,
+      surfaceJob: 0,
+    })
+    world.markerHidden = true
+    setAnchor(null)
+    get().showBanner(`NEW GAME+ ${'★'.repeat(s.prestige + 1)} — THE DRIFT REMEMBERS`, '#b08bff')
+  },
 
   setSurface: (surface) => set({ surface }),
   setLandPrompt: (landPrompt) => {
@@ -77,6 +96,7 @@ export const useStore = create((set, get) => ({
       patch.ore = save.ore || 0
       patch.discoveries = save.discoveries || []
       patch.stats = { kills: 0, deaths: 0, earned: 0, busts: 0, ...(save.stats || {}) }
+      patch.prestige = save.prestige || 0
     }
     patch.hp = maxHpFor(patch.upgrades || {})
     set(patch)
@@ -231,8 +251,9 @@ export const useStore = create((set, get) => ({
   completeChapter: () => {
     const s = get()
     const ch = STORY[s.chapter]
-    get().addCash(ch.pay)
-    get().showBanner(`MISSION PASSED — $${ch.pay}`, '#6dd96d')
+    const pay = Math.round(ch.pay * (1 + s.prestige * 0.5))
+    get().addCash(pay)
+    get().showBanner(`MISSION PASSED — $${pay}`, '#6dd96d')
     world.markerHidden = true
     setAnchor(null)
     const nextCh = s.chapter + 1

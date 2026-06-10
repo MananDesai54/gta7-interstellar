@@ -366,6 +366,14 @@ export function Hud() {
             })()}
           </div>
           <button className="pause-btn" onClick={togglePause}>RESUME</button>
+          {useStore.getState().chapter >= 8 && (
+            <button
+              className="pause-btn prestige"
+              onClick={() => useStore.getState().doPrestige()}
+            >
+              ★ PRESTIGE — NEW GAME+ (KEEP EVERYTHING, PAY +50%)
+            </button>
+          )}
           <div className="pause-controls">
             <div><b>CLICK</b> mouse flight</div>
             <div><b>W/S</b> thrust</div>

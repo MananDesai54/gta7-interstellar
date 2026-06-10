@@ -45,6 +45,7 @@ export function TitleScreen() {
         {save && (
           <div className="t-save">
             SAVE FOUND — {save.name} · ${(save.cash || 0).toLocaleString()} · CH{Math.min((save.chapter || 0) + 1, 9)}
+            {save.prestige > 0 && <span className="t-prestige"> NG+{'★'.repeat(Math.min(save.prestige, 5))}</span>}
             <button
               className="t-wipe"
               onClick={() => {

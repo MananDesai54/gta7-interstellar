@@ -329,3 +329,8 @@ body { font-family: var(--hud-font); }
 /* radio retune pop */
 .radio { animation: radio-pop 0.5s cubic-bezier(0.2, 1.4, 0.4, 1); }
 @keyframes radio-pop { 0% { transform: scale(1.25) translateX(8px); color: #fff; } }
+
+/* ---------- prestige ---------- */
+.pause-btn.prestige { border-color: #b08bff; color: #b08bff; background: rgba(176, 139, 255, 0.08); font-size: 12px; }
+.pause-btn.prestige:hover { background: rgba(176, 139, 255, 0.22); }
+.t-prestige { color: #b08bff; }
