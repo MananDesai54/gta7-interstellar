@@ -16,7 +16,7 @@ Deploy: standard Next.js app — `vercel`, or `npm run build && npm start`.
 
 ## Story mode — THE DRIFT
 
-Eight chapters with dialogue (advance with **ENTER**):
+Eight chapters with dialogue and GTA-style chapter title cards (ENTER to advance):
 
 1. **FRESH OFF THE FREIGHTER** — prove you can fly, tag a cache in Earth orbit
 2. **RING RUNNER** — thread three drop buoys around a moving Saturn
@@ -27,71 +27,71 @@ Eight chapters with dialogue (advance with **ENTER**):
 7. **ROCK HUSTLE** — mine 5 ore chunks from the belt's glowing rocks
 8. **KING OF THE BELT** — kill RED VARGA at the pirate hideout
 
-Finish the story to unlock endless free-roam side jobs. Dying restarts the active objective and costs a $200 dry-dock fee.
+Finish the story to unlock endless free-roam work. Dying restarts the active objective ($200 dry-dock fee). You're safe during cutscenes.
 
-## Neo Vega City
+## Places
 
-A neon free-station floating between Earth's orbit and the black hole: ~35 lit towers to fly between (they hurt), holographic billboards, shuttle traffic looping the canyons, and a landing pad that doubles as a garage + ore market. Cops will chase you straight into the streets.
+- **Neo Vega City** — neon free-station: ~35 collidable lit towers, holo billboards, canyon shuttle traffic, landing-pad garage with twin turrets
+- **Planet surfaces** — press **L** near Earth, Mars or Luna to land:
+  - *Bahía Libre* (Earth): hazy coastal island city
+  - *Red Gulch* (Mars): rust canyon, mining rigs, rocket launch site
+  - *Tranquility Flats* (Luna): craters, glass hangars, 16 u/s² gravity hops
+  - Each has its own gravity, sky, fog, courier jobs and **claim-jumper turrets** ($250 a kill, they shoot first). Climb or press L to return to orbit
+- **Asteroid belt** — collisions hurt; heat decays 3× faster inside; 16 gold-glowing ore rocks; pirate territory
+- **Saturn's rings** — physically there: 140 debris chunks, flying the plane sandblasts 5 hull/s
+- **Meridian Station** — garage in Earth orbit
 
-## Flight feel
+## Physics (the real kind)
 
-- **Click** the screen for pointer-lock mouse flight (keyboard A/D + arrows still work)
-- **X** = overdrive: ~6× thrust for crossing the system, auto-cuts near gravity wells, heat, or the belt
-- KSP-style trajectory line, screen-edge waypoint arrow with distance, damage flash + camera shake, 3s respawn protection
-- **ESC/P** pause menu, **J** galaxy log
+- Keplerian orbits, consistent with the gravity field (T = 2π√(a³/GM)) — park in orbit and you stay there; AFK ships orbit instead of dying
+- Inverse-square gravity from sun, planets, moon, black hole. Slingshots work. The trajectory line (KSP-style) shows your future
+- Drag only applies while steering — coasting conserves momentum
+- **Helios** and **Gargantua's event horizon** kill; planets, buildings and rocks bounce with damage
+- **Solar flares** every ~3 min: 10s warning, then a radiation storm across the inner system
 
-## Exploration — Galaxy Log (J)
+## Hustles
 
-7 discoveries pay cash bonuses the first time you find them: Neo Vega, Luna, a comet on a long ellipse, a derelict science vessel in Gargantua's well, a monolith (1:4:9), the pirate hideout, and a sun-grazing dare. Hints are in the log.
-
-## Economy
-
-- **Mining**: shoot the gold-glowing belt rocks, scoop the ore chunks, sell at any dock ($90/ea)
-- **Pirates** guard the belt: $150 + credit chips per kill, no police heat
-- **Convoys**, **side jobs**, **Saturn Circuit** time trials, cop bounties — all still pay
-
-## Physics
-
-- Planets ride analytic Keplerian orbits around **Helios** (Earth ~8 min, Mars ~5 min, Saturn ~15 min) — on rails, KSP-style
-- Your ship feels inverse-square gravity from **every body**: the sun, three planets, and the black hole. Slingshots work. Decaying orbits work
-- **Helios** (kill radius) and **Gargantua's event horizon** are lethal; planets bounce you off with hull damage
-- Mission markers anchor to orbiting bodies — your destination moves, lead it
-
-## World extras
-
-- **Asteroid belt** between Mars and Earth orbits — collide and you crater, but heat decays 3× faster inside (police can't track you through the rocks)
-- **Trajectory preview** — cyan line predicts your path through the gravity field, KSP-style. Read it to line up slingshots
-- **Meridian Station** rides Earth orbit — fly close, press **G** to dock at the garage: armor, boost tanks, engine tunes, dual cannons, paint jobs
-- **Saturn Circuit** — fly through the cyan gate near Saturn to start a time trial: 7 rings + return. Best lap saved
-- **Smuggler convoys** cross the system every couple of minutes — wipe all three gold haulers for $1,000 (and a 2-star spike)
-- **Sound** — engine hum follows the throttle, lasers fall off with distance, and each radio station plays its own procedural loop (R to dial)
-
-## Persistence (no database)
-
-Your save — cash, story progress, upgrades, paint, best lap — lives in `localStorage` and restores on reload.
+- **Side jobs** + **timed ferry fares** (countdown timer, miss = no pay)
+- **Mining**: crack gold rocks, scoop ore, sell at any dock ($90/ea)
+- **Pirates** at the belt hideout ($150 + chips, no heat) and boss **RED VARGA**
+- **Smuggler convoys** every ~2 min ($1,000 for a full wipe)
+- **Saturn Circuit** time trial — best lap saved
+- **Surface courier runs** ($400 a hop) and turret bounties
+- **Wanted system**: stars → patrols → INTERCEPTORS at 4+ stars. Loiter near a cop: **BUSTED** ($300 fine). Kill heat in the belt
+- **Exploration**: 7 paid discoveries in the Galaxy Log (**J**) — comet, monolith, derelict, more
+- **Garage** (G at any dock): armor, boost tanks, engine tunes, dual cannons, paint
 
 ## Controls
 
-| Key | Action |
+| Input | Action |
 | --- | --- |
+| Click | pointer-lock mouse flight |
 | W / S | thrust / brake |
-| A / D | yaw |
-| ↑ / ↓ | pitch |
-| Q / E | roll |
+| A / D, ↑ / ↓, Q / E | yaw, pitch, roll |
 | Shift | boost |
+| X | overdrive (long-haul ~6× thrust) |
 | Space | lasers |
-| R | radio |
-| G | dock / undock at station |
-| Enter | advance dialogue / start |
+| L | land / lift off |
+| G | dock garage |
+| J | galaxy log |
+| M | minimap zoom |
+| H | photo mode |
+| R | radio (6 stations, procedural two-voice tunes) |
+| ESC / P | pause (stats live here) |
+| 🎮 Gamepad | stick=yaw/pitch, bumpers=roll, RT=thrust, LT=brake, A=fire, B=boost, Y=overdrive, X=land, Start=pause |
+
+## Persistence (no database)
+
+Save lives in `localStorage`: cash, story progress, upgrades, paint, ore, best lap, discoveries, lifetime stats (kills/deaths/busts/earnings).
 
 ## Architecture
 
-- `src/game/physics.js` — body table, Kepler orbit positions, summed gravity
+- `src/game/physics.js` — Kepler body table + summed gravity
 - `src/game/world.js` — mutable 60fps state (no React renders)
-- `src/game/store.js` — zustand: HUD, story progression, garage, races
-- `src/game/story.js` — chapters, dialogue, objective definitions
-- `src/components/` — R3F scene: textured planets, shader accretion disk, procedural ships, laser/explosion pools
+- `src/game/store.js` — zustand: HUD, story, garage, races, stats
+- `src/game/story.js`, `surfaces.js`, `discoveries.js` — content tables
+- `src/components/` — R3F scene; Kenney Space Kit CC0 models in `/public/models`
 
 In dev, `window.__game = { world, useStore }` for debugging.
 
-> Multiplayer (Socket.IO lobby, PvP bounties, shared leaderboard) was removed in this version — it lives at commit `837b7b1` if you ever want it back.
+> Multiplayer (Socket.IO lobby, PvP bounties, shared leaderboard) was removed for Vercel compatibility — it lives at commit `837b7b1`.
