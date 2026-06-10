@@ -7,7 +7,7 @@ import { world, fireLaser, setAnchor } from '../game/world'
 import { useStore } from '../game/store'
 import { advanceMission, newMission, failMission } from '../game/missions'
 import { STORY } from '../game/story'
-import { beep, setEngine } from '../game/audio'
+import { beep, setEngine, setTension } from '../game/audio'
 import { BODIES, applyGravity, bodyPos } from '../game/physics'
 import { thrustMultFor } from '../game/shop'
 import { BH_POS, CITY_POS, CITY_PAD } from '../game/constants'
@@ -533,6 +533,15 @@ export function PlayerShip() {
         }
       }
     }
+
+    // pursuit score: drone swells with stars when patrols are actually on you
+    const hot =
+      s.wanted >= 2 &&
+      !onSurface &&
+      [...world.cops.values()].some(
+        (c) => c.alive && c.ref.current && c.ref.current.position.distanceTo(ship.position) < 1500,
+      )
+    setTension(hot ? Math.min(1, s.wanted / 5) : 0)
 
     world.playerPos.copy(ship.position)
     world.playerQuat.copy(ship.quaternion)

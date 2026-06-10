@@ -1,6 +1,8 @@
 let actx = null
 let engine = null
 let radio = null
+let radioBus = null
+let tension = null
 
 export function initAudio() {
   if (actx) return
@@ -20,6 +22,40 @@ export function initAudio() {
   gain.connect(actx.destination)
   osc.start()
   engine = { osc, gain, filter }
+
+  // radio routes through a duckable bus
+  radioBus = actx.createGain()
+  radioBus.gain.value = 1
+  radioBus.connect(actx.destination)
+
+  // pursuit drone: two detuned saws through a dark lowpass, silent until hot
+  const t1 = actx.createOscillator()
+  const t2 = actx.createOscillator()
+  const tg = actx.createGain()
+  const tf = actx.createBiquadFilter()
+  t1.type = 'sawtooth'
+  t2.type = 'sawtooth'
+  t1.frequency.value = 55
+  t2.frequency.value = 55.7
+  tf.type = 'lowpass'
+  tf.frequency.value = 320
+  tg.gain.value = 0
+  t1.connect(tf)
+  t2.connect(tf)
+  tf.connect(tg)
+  tg.connect(actx.destination)
+  t1.start()
+  t2.start()
+  tension = { tg, t1, t2 }
+}
+
+// 0..1 — pursuit heat. Drone swells, radio ducks out of the way.
+export function setTension(level) {
+  if (!tension) return
+  const t = actx.currentTime
+  tension.tg.gain.setTargetAtTime(level * 0.04, t, 0.4)
+  tension.t1.frequency.setTargetAtTime(55 + level * 12, t, 0.5)
+  if (radioBus) radioBus.gain.setTargetAtTime(1 - level * 0.75, t, 0.4)
 }
 
 // throttle 0..1, boosting bool — called every frame from PlayerShip
@@ -77,7 +113,7 @@ export function startRadio(stationIdx) {
     const src = actx.createBufferSource()
     src.buffer = buf
     src.loop = true
-    src.connect(actx.destination)
+    src.connect(radioBus || actx.destination)
     src.start()
     radio = { src }
     return
@@ -93,7 +129,7 @@ export function startRadio(stationIdx) {
     g.gain.setValueAtTime(vol, when)
     g.gain.exponentialRampToValueAtTime(0.0003, when + dur)
     o.connect(g)
-    g.connect(actx.destination)
+    g.connect(radioBus || actx.destination)
     o.start(when)
     o.stop(when + dur + 0.05)
   }
