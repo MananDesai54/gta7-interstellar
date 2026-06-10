@@ -14,6 +14,7 @@ import { Trajectory } from './components/Trajectory'
 import { Station } from './components/Station'
 import { RaceCourse } from './components/RaceCourse'
 import { Convoy } from './components/Convoy'
+import { Ambush } from './components/Ambush'
 import { City } from './components/City'
 import { Pirates } from './components/Pirates'
 import { Pickups } from './components/Pickups'
@@ -85,6 +86,7 @@ export default function Game() {
             <Discoveries />
             <RaceCourse />
             <Convoy />
+            <Ambush />
             <Surface />
             <Character />
             <PlayerShip />
