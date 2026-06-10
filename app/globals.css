@@ -285,3 +285,12 @@ body { font-family: var(--hud-font); }
 .t-save { margin-top: 14px; font-size: 12px; letter-spacing: 2px; color: var(--cash); animation: fade-in 0.8s 0.9s both; }
 .t-wipe { margin-left: 14px; padding: 4px 10px; background: none; border: 1px solid #b33; color: #e55;
   font-family: var(--hud-font); font-size: 11px; letter-spacing: 2px; cursor: pointer; pointer-events: auto; }
+
+/* ---------- chapter intro card (GTA mission title) ---------- */
+.chapter-card { position: fixed; bottom: 18vh; right: 6vw; text-align: right; pointer-events: none;
+  animation: cc-in 0.6s cubic-bezier(0.2, 1, 0.3, 1) both, cc-out 0.5s 2.8s both; }
+.cc-num { font-size: 14px; font-weight: 700; letter-spacing: 8px; color: var(--cyan); text-shadow: 1px 1px 0 #000; }
+.cc-title { font-family: var(--display); font-size: 58px; line-height: 1.05; color: var(--gold);
+  text-shadow: 3px 3px 0 #000, 0 0 30px rgba(245, 200, 67, 0.35); transform: skewX(-3deg); }
+@keyframes cc-in { from { opacity: 0; transform: translateX(40px); } }
+@keyframes cc-out { to { opacity: 0; } }

@@ -23,7 +23,7 @@ export function Hud() {
   const {
     started, dead, deathReason, hp, boost, cash, wanted, ore,
     missionTitle, missionBody, banner, station, dialogue, lineIdx,
-    shopOpen, nearStation, race, upgrades, paint, paused, showLog, discoveries,
+    shopOpen, nearStation, race, upgrades, paint, paused, showLog, discoveries, chapterCard,
   } = useStore()
   const nextStation = useStore((s) => s.nextStation)
   const buy = useStore((s) => s.buy)
@@ -221,6 +221,12 @@ export function Hud() {
       <canvas ref={canvas} className="minimap" width={190} height={190} />
       <div className="radio">{STATIONS[station]}</div>
       {banner && <div className="banner" style={{ color: banner.color }}>{banner.text}</div>}
+      {chapterCard && (
+        <div className="chapter-card">
+          <div className="cc-num">CHAPTER {chapterCard.num}</div>
+          <div className="cc-title">{chapterCard.title}</div>
+        </div>
+      )}
       {gravWarn && !dead && <div className="grav-warn">⚠ GRAVITY WELL ⚠</div>}
       {inBelt && !dead && <div className="belt-hint">ASTEROID COVER — HEAT FADES FAST</div>}
       <div className="crosshair">+</div>

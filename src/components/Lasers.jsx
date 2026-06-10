@@ -126,7 +126,7 @@ export function Lasers() {
       } else if ((L.kind === 'cop' || L.kind === 'pirate') && !s.dead && s.started && L.pos.distanceTo(world.playerPos) < 16) {
         hit = true
         beep(180, 0.1)
-        s.damage(L.kind === 'pirate' ? 10 : 8, L.kind === 'pirate' ? "Shredded by Varga's crew." : 'Smoked by space cops.')
+        s.damage(L.kind === 'pirate' ? 9 : 8, L.kind === 'pirate' ? "Shredded by Varga's crew." : 'Smoked by space cops.')
       }
 
       if (hit || L.life <= 0) world.lasers.splice(i, 1)

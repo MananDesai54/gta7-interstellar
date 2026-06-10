@@ -28,6 +28,7 @@ export const useStore = create((set, get) => ({
   showLog: false,
   ore: 0,
   discoveries: [],
+  chapterCard: null, // {num, title} — GTA-style mission intro card
 
   // garage
   upgrades: {},
@@ -107,7 +108,11 @@ export const useStore = create((set, get) => ({
       carryingCore: false,
       missionTitle: `CH ${ch.id} — ${ch.title}`,
       missionBody: obj.text,
+      chapterCard: { num: ch.id, title: ch.title },
     })
+    setTimeout(() => {
+      if (get().chapterCard?.num === ch.id) set({ chapterCard: null })
+    }, 3400)
     world.markerHidden = false
     if (obj.anchorStatic) setAnchor({ static: obj.anchorStatic })
     else if (obj.type === 'goto' || obj.type === 'corewell') setAnchor(obj.anchor)
@@ -298,7 +303,7 @@ export const useStore = create((set, get) => ({
 
   damage: (n, reason) => {
     const s = get()
-    if (s.dead || !s.started || s.paused) return
+    if (s.dead || !s.started || s.paused || s.stage === 'dialogue') return // cutscene = safe
     if (performance.now() < world.invulnUntil) return // respawn grace
     world.flashT = performance.now()
     world.shake = Math.min(1, world.shake + 0.45)

@@ -63,8 +63,8 @@ function Pirate({ index, boss }) {
         m.position.addScaledVector(tmp, (data.boss ? 165 : 140) * dt)
       }
       data.fireCd -= dt
-      if (d < 750 && data.fireCd <= 0) {
-        data.fireCd = data.boss ? 0.55 : 1.0
+      if (d < 750 && data.fireCd <= 0 && s.stage !== 'dialogue') {
+        data.fireCd = data.boss ? 0.6 : 1.5
         const dir = tmp.copy(world.playerPos).sub(m.position).normalize()
         dir.x += (Math.random() - 0.5) * 0.07
         dir.y += (Math.random() - 0.5) * 0.07
