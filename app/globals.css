@@ -303,3 +303,11 @@ body { font-family: var(--hud-font); }
 .surface-tag { position: fixed; top: 64px; right: 26px; font-size: 13px; font-weight: 700;
   letter-spacing: 2px; color: #ffd24a; text-shadow: 1px 1px 0 #000; }
 .surface-tag span { color: #9aa3b5; font-weight: 400; }
+
+/* ---------- solar flare ---------- */
+.flare-warn { position: fixed; top: 17%; width: 100%; text-align: center; font-size: 19px; font-weight: 700;
+  letter-spacing: 6px; color: #ff7a22; text-shadow: 2px 2px 0 #000; animation: blink 0.5s infinite; }
+.flare-tint { position: fixed; inset: 0; pointer-events: none; z-index: 43;
+  background: radial-gradient(ellipse at center, rgba(255, 120, 30, 0.07) 0%, rgba(255, 80, 10, 0.22) 100%);
+  animation: flare-pulse 0.8s ease-in-out infinite alternate; }
+@keyframes flare-pulse { from { opacity: 0.6; } to { opacity: 1; } }

@@ -38,6 +38,8 @@ export function Hud() {
   const [speed, setSpeed] = useState(0)
   const [gravWarn, setGravWarn] = useState(false)
   const [inBelt, setInBelt] = useState(false)
+  const [flare, setFlare] = useState(0)
+  const [flareWarn, setFlareWarn] = useState(false)
   const [warpOn, setWarpOn] = useState(false)
   const [flash, setFlash] = useState(false)
   const [raceMs, setRaceMs] = useState(0)
@@ -121,6 +123,8 @@ export function Hud() {
       setSpeed(Math.round(world.playerVel.length()))
       setGravWarn(world.gravWarn)
       setInBelt(world.inBelt)
+      setFlare(world.flare || 0)
+      setFlareWarn(!!world.flareWarn)
       setWarpOn(world.warp > 0.5)
       setFlash(performance.now() - world.flashT < 220)
       const r = useStore.getState().race
@@ -230,6 +234,8 @@ export function Hud() {
         </div>
       )}
       {gravWarn && !dead && <div className="grav-warn">⚠ GRAVITY WELL ⚠</div>}
+      {flareWarn && !dead && <div className="flare-warn">☀ SOLAR FLARE INBOUND ☀</div>}
+      {flare > 0 && <div className="flare-tint" />}
       {inBelt && !dead && <div className="belt-hint">ASTEROID COVER — HEAT FADES FAST</div>}
       <div className="crosshair">+</div>
 

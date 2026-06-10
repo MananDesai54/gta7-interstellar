@@ -25,6 +25,7 @@ import { Lasers } from './components/Lasers'
 import { Explosions } from './components/Explosions'
 import { MissionMarker } from './components/MissionMarker'
 import { Surface } from './components/Surface'
+import { Events } from './components/Events'
 import { Hud } from './components/Hud'
 import { TitleScreen } from './components/TitleScreen'
 import { useStore } from './game/store'
@@ -67,6 +68,7 @@ export default function Game() {
           <ambientLight intensity={0.35} color="#46566e" />
           <Stars radius={16000} depth={30000} count={9000} factor={180} saturation={0} fade speed={0.4} />
           <PhysicsSystem />
+          <Events />
           <Nebula />
           <Sun />
           <Suspense fallback={null}>
