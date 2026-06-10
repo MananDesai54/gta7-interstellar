@@ -24,6 +24,7 @@ useGLTF.preload('/models/turret_double.glb')
 useGLTF.preload('/models/rocket_baseA.glb')
 useGLTF.preload('/models/monorail_trainCargo.glb')
 useGLTF.preload('/models/astronautA.glb')
+useGLTF.preload('/models/astronautB.glb')
 
 export const CITY_BUILDINGS = [
   '/models/building-a.glb',

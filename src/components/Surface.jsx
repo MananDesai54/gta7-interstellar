@@ -49,7 +49,75 @@ function SurfaceWorld({ id }) {
       {id === 'mars' && <MarsGulch props={props} />}
       {id === 'luna' && <LunaFlats props={props} />}
       <Turrets cfg={cfg} />
+      <Pedestrians cfg={cfg} count={id === 'earth' ? 9 : 4} />
     </group>
+  )
+}
+
+// Locals going about their day. Shoot one and the whole system hears
+// about it — heat spikes, and the patrols remember when you fly back up.
+function Pedestrians({ cfg, count }) {
+  const tmp = useMemo(() => new THREE.Vector3(), [])
+  const peds = useMemo(
+    () =>
+      Array.from({ length: count }, (_, i) => ({
+        ref: { current: null },
+        data: {
+          alive: true,
+          respawnAt: 0,
+          speed: 9 + Math.random() * 8,
+          target: new THREE.Vector3(),
+          home: new THREE.Vector3(Math.cos((i / count) * Math.PI * 2) * (180 + Math.random() * 420), 0, Math.sin((i / count) * Math.PI * 2) * (180 + Math.random() * 420)),
+        },
+      })),
+    [count],
+  )
+
+  useEffect(() => {
+    world.peds = peds
+    peds.forEach((p) => p.data.target.copy(p.data.home))
+    return () => {
+      world.peds = []
+    }
+  }, [peds])
+
+  useFrame((state, dt) => {
+    const s = useStore.getState()
+    if (s.paused) return
+    const t = state.clock.elapsedTime
+    for (const p of peds) {
+      const m = p.ref.current
+      if (!m) continue
+      if (!p.data.alive) {
+        if (t > p.data.respawnAt) {
+          p.data.alive = true
+          m.visible = true
+          m.position.copy(p.data.home).setY(0)
+        }
+        continue
+      }
+      tmp.copy(p.data.target).sub(m.position)
+      tmp.y = 0
+      if (tmp.length() < 8) {
+        const a = Math.random() * Math.PI * 2
+        p.data.target.copy(p.data.home).add(new THREE.Vector3(Math.cos(a) * 140, 0, Math.sin(a) * 140))
+      } else {
+        m.position.addScaledVector(tmp.normalize(), p.data.speed * dt)
+        m.lookAt(m.position.x + tmp.x, m.position.y, m.position.z + tmp.z)
+        // amble bob
+        m.children[0] && (m.children[0].position.y = Math.abs(Math.sin(t * 6 + p.data.speed)) * 0.5)
+      }
+    }
+  })
+
+  return (
+    <>
+      {peds.map((p, i) => (
+        <group key={i} ref={(el) => (p.ref.current = el)} position={p.data.home.toArray()}>
+          <Model url="/models/astronautB.glb" scale={8} rotation-y={Math.PI} />
+        </group>
+      ))}
+    </>
   )
 }
 

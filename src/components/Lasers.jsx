@@ -91,6 +91,21 @@ export function Lasers() {
             }
           }
         }
+        // pedestrians — murder is loud, heat spikes hard
+        for (const p of world.peds) {
+          if (!p.data.alive || !p.ref.current) continue
+          p.ref.current.getWorldPosition(tmp)
+          if (L.pos.distanceTo(tmp) < 10) {
+            hit = true
+            p.data.alive = false
+            p.data.respawnAt = t + 70
+            p.ref.current.visible = false
+            world.explode(tmp.clone(), '#ffffff')
+            spawnPickup(tmp, 20)
+            s.setWanted(Math.min(5, s.wanted + 2))
+            s.showBanner('★★ CIVILIAN DOWN — SYSTEM-WIDE ALERT ★★', '#ff5544')
+          }
+        }
         // surface defense turrets
         for (const e of world.turrets) {
           if (!e.data.alive || !e.ref.current) continue
